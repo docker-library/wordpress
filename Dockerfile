@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
 		curl \
 		libapache2-mod-php5 \
 		php5-curl \
+		php5-gd \
 		php5-mysql \
 		rsync \
 		wget
