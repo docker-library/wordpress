@@ -2,9 +2,12 @@ FROM debian:jessie
 
 RUN apt-get update && apt-get install -y \
 		apache2 \
+		curl \
 		libapache2-mod-php5 \
+		php5-curl \
 		php5-mysql \
-		rsync
+		rsync \
+		wget
 RUN a2enmod rewrite
 
 RUN rm -rf /var/www/html && mkdir /var/www/html
