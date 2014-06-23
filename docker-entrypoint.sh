@@ -58,6 +58,28 @@ set_config 'DB_USER' "$WORDPRESS_DB_USER"
 set_config 'DB_PASSWORD' "$WORDPRESS_DB_PASSWORD"
 set_config 'DB_NAME' "$WORDPRESS_DB_NAME"
 
+# allow any of these "Authentication Unique Keys and Salts." to be specified via
+# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
+UNIQUES=(
+	AUTH_KEY
+	SECURE_AUTH_KEY
+	LOGGED_IN_KEY
+	NONCE_KEY
+	AUTH_SALT
+	SECURE_AUTH_SALT
+	LOGGED_IN_SALT
+	NONCE_SALT
+)
+for unique in "${UNIQUES[@]}"; do
+	eval unique_value=\$WORDPRESS_$unique
+	if [ "$unique_value" ]; then
+		set_config "$unique" "$unique_value"
+	else
+		# if not specified, let's generate a random value
+		set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
+	fi
+done
+
 TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
