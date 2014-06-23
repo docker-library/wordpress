@@ -48,7 +48,9 @@ fi
 set_config() {
 	key="$1"
 	value="$2"
-	sed -ri "s/((['\"])$key\2\s*,\s*)(['\"]).*\3/\1'$value'/" wp-config.php
+	php_escaped_value="$(php -r 'var_export($argv[1]);' "$value")"
+	sed_escaped_value="$(echo "$php_escaped_value" | sed 's/[\/&]/\\&/g')"
+	sed -ri "s/((['\"])$key\2\s*,\s*)(['\"]).*\3/\1$sed_escaped_value/" wp-config.php
 }
 
 WORDPRESS_DB_HOST="${MYSQL_PORT_3306_TCP#tcp://}"
