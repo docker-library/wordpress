@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:wheezy
 
 RUN apt-get update && apt-get install -y \
 		apache2 \
@@ -35,7 +35,7 @@ RUN find "$APACHE_CONFDIR" -type f -exec sed -ri ' \
 ' '{}' ';'
 
 ADD . /usr/src/wordpress
-RUN cp /usr/src/wordpress/docker-apache.conf /etc/apache2/sites-available/wordpress.conf \
+RUN cp /usr/src/wordpress/docker-apache.conf /etc/apache2/sites-available/wordpress \
 	&& a2dissite 000-default \
 	&& a2ensite wordpress
 
