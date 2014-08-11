@@ -19,5 +19,5 @@ versionAliases+=( $fullVersion latest )
 
 echo
 for va in "${versionAliases[@]}"; do
-	echo "$va: ${url}@${commit} $version"
+	echo "$va: ${url}@${commit}"
 done
