@@ -56,12 +56,28 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 EOPHP
 fi
 
+# modify an existing configuration value 
 set_config() {
 	key="$1"
 	value="$2"
-	php_escaped_value="$(php -r 'var_export($argv[1]);' "$value")"
-	sed_escaped_value="$(echo "$php_escaped_value" | sed 's/[\/&]/\\&/g')"
-	sed -ri "s/((['\"])$key\2\s*,\s*)(['\"]).*\3/\1$sed_escaped_value/" wp-config.php
+	if [[ "$2" =~ ^(true|false|[0-9]+)$ ]]; then
+		# these don't need escaping
+		sed_escaped_value=$2
+	else
+		php_escaped_value="$(php -r 'var_export($argv[1]);' "$value")"
+		sed_escaped_value="$(echo "$php_escaped_value" | sed 's/[\/&]/\\&/g')"
+	fi
+	sed -ri "s/((['\"])$key\2\s*,\s*)((['\"]).*\4|true|false|[0-9]+)/\1$sed_escaped_value/" wp-config.php
+}
+
+# delete a configuration value
+del_config() {
+	sed -ri "/((['\"])$1\2\s*,\s*)((['\"]).*\4|true|false|[0-9]+)/d" wp-config.php
+}
+
+# create a blank configuation value (for use in conjunction with above)
+blank_config() {
+	sed -ir "/Happy blogging/idefine('$1', '');" wp-config.php
 }
 
 WORDPRESS_DB_HOST="${MYSQL_PORT_3306_TCP#tcp://}"
@@ -92,6 +108,27 @@ for unique in "${UNIQUES[@]}"; do
 		set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
 	fi
 done
+
+# allow any of these wordpress configuration opions to be specified via
+# environment variables with a  "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
+# if they are not set they will be returned to default by removal of the option
+# i.e. options that must be present cannot be part of this section
+CONFIG_OPTS=(
+	WP_DEBUG
+	WP_DEBUG_DISPLAY
+	SCRIPT_DEBUG
+	SAVEQUERIES
+	WP_ENV
+)
+for config_opt in "${CONFIG_OPTS[@]}"; do
+	eval config_value=\$WORDPRESS_$config_opt
+	del_config "$config_opt"
+	if [ "$config_value" ]; then
+		blank_config "$config_opt"
+		set_config "$config_opt" "$config_value"
+	fi
+done
+
 
 TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
 <?php
