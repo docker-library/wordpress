@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
 		php5-gd \
 		php5-mysql \
 		rsync \
-		wget
+		wget \
+	&& rm -rf /var/lib/apt/lists/*
 RUN a2enmod rewrite
 
 # copy a few things from apache's init script that it requires to be setup
