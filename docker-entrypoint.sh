@@ -43,6 +43,11 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 	fi
 fi
 
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 640 {} \;
+
+chmod 604 .htaccess
+
 # TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
 if [ ! -e wp-config.php ]; then
@@ -92,6 +97,8 @@ for unique in "${UNIQUES[@]}"; do
 		set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
 	fi
 done
+
+chmod 400 wp-config.php
 
 TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
 <?php
