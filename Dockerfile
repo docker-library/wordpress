@@ -1,15 +1,5 @@
-FROM debian:wheezy
+FROM php:5.6-apache
 
-RUN apt-get update && apt-get install -y \
-		apache2 \
-		curl \
-		libapache2-mod-php5 \
-		php5-curl \
-		php5-gd \
-		php5-mysql \
-		rsync \
-		wget \
-	&& rm -rf /var/lib/apt/lists/*
 RUN a2enmod rewrite
 
 # copy a few things from apache's init script that it requires to be setup
@@ -41,9 +31,6 @@ ENV WORDPRESS_UPSTREAM_VERSION 4.0
 
 # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
 RUN curl -SL http://wordpress.org/wordpress-${WORDPRESS_UPSTREAM_VERSION}.tar.gz | tar -xzC /usr/src/
-
-COPY docker-apache.conf /etc/apache2/sites-available/wordpress
-RUN a2dissite 000-default && a2ensite wordpress
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
