@@ -114,6 +114,6 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 $mysql->close();
 EOPHP
 
-chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" .
+chown -R www-data:www-data .
 
 exec "$@"
