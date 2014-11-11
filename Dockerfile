@@ -1,10 +1,10 @@
 FROM php:5.6-apache
 
+RUN apt-get update && apt-get install -y rsync && rm -r /var/lib/apt/lists/*
+
 RUN a2enmod rewrite
 
-RUN rm -rf /var/www/html && mkdir /var/www/html
 VOLUME /var/www/html
-WORKDIR /var/www/html
 
 ENV WORDPRESS_VERSION 4.0.0
 ENV WORDPRESS_UPSTREAM_VERSION 4.0
@@ -14,6 +14,6 @@ RUN curl -SL http://wordpress.org/wordpress-${WORDPRESS_UPSTREAM_VERSION}.tar.gz
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
+# grr, ENTRYPOINT resets CMD now
 ENTRYPOINT ["/entrypoint.sh"]
-EXPOSE 80
 CMD ["apache2", "-DFOREGROUND"]
