@@ -14,9 +14,13 @@ VOLUME /var/www/html
 
 ENV WORDPRESS_VERSION 4.0.0
 ENV WORDPRESS_UPSTREAM_VERSION 4.0
+ENV WORDPRESS_SHA1 73449bbc015e3d1858f13f56f3289202bd756654
 
 # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
-RUN curl -SL http://wordpress.org/wordpress-${WORDPRESS_UPSTREAM_VERSION}.tar.gz | tar -xzC /usr/src/
+RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_UPSTREAM_VERSION}.tar.gz \
+	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
+	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
+	&& rm wordpress.tar.gz
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
