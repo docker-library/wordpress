@@ -89,7 +89,10 @@ for unique in "${UNIQUES[@]}"; do
 		set_config "$unique" "$unique_value"
 	else
 		# if not specified, let's generate a random value
-		set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
+		current_set="$(sed -rn "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
+		if [ "$current_set" = 'put your unique phrase here' ]; then
+			set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
+		fi
 	fi
 done
 
