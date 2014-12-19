@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+
+if [ -f /var/run/apache2/apache2.pid ] ; then
+rm /var/run/apache2/apache2.pid 
+fi
+
 if [ -z "$MYSQL_PORT_3306_TCP" ]; then
 	echo >&2 'error: missing MYSQL_PORT_3306_TCP environment variable'
 	echo >&2 '  Did you forget to --link some_mysql_container:mysql ?'
