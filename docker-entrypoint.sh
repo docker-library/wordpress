@@ -100,16 +100,25 @@ TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWO
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 
-list($host, $port) = explode(':', $argv[1], 2);
-$mysql = new mysqli($host, $argv[2], $argv[3], '', (int)$port);
+$stderr = fopen('php://stderr', 'w');
 
-if ($mysql->connect_error) {
-	file_put_contents('php://stderr', 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
-	exit(1);
-}
+list($host, $port) = explode(':', $argv[1], 2);
+
+$maxTries = 10;
+do {
+	$mysql = new mysqli($host, $argv[2], $argv[3], '', (int)$port);
+	if ($mysql->connect_error) {
+		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
+		--$maxTries;
+		if ($maxTries <= 0) {
+			exit(1);
+		}
+		sleep(3);
+	}
+} while ($mysql->connect_error);
 
 if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($argv[4]) . '`')) {
-	file_put_contents('php://stderr', 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
+	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
 	$mysql->close();
 	exit(1);
 }
