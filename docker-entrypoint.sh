@@ -96,6 +96,12 @@ for unique in "${UNIQUES[@]}"; do
 	fi
 done
 
+# wait for MySQL server to start properly before trying to create database.
+while ! exec 6<>/dev/tcp/${MYSQL_PORT_3306_TCP_ADDR}/${MYSQL_PORT_3306_TCP_PORT}; do
+    echo "$(date) - Waiting for MySQL container to start properly"
+    sleep 5
+done
+
 TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
