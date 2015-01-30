@@ -29,7 +29,7 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 		echo >&2 "WARNING: $(pwd) is not empty - press Ctrl+C now if this is an error!"
 		( set -x; ls -A; sleep 10 )
 	fi
-  tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
+	tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
 	echo >&2 "Complete! WordPress has been successfully copied to $(pwd)"
 fi
 
