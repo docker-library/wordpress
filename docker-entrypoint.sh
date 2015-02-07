@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$MYSQL_PORT_3306_TCP" ]; then
-	WORDPRESS_DB_HOST='mysql'
+	WORDPRESS_DB_HOST="${MYSQL_PORT_3306_TCP#tcp://}"
 fi
 
 if [ -z "$WORDPRESS_DB_HOST" ]; then
