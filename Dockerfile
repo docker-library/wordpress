@@ -22,6 +22,9 @@ RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_UPS
 	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
 	&& rm wordpress.tar.gz
 
+# inlarge upload size
+RUN printf "\nphp_value post_max_size 8M\nphp_value upload_max_filesize 8M\n" >> .htaccess
+
 COPY docker-entrypoint.sh /entrypoint.sh
 
 # grr, ENTRYPOINT resets CMD now
