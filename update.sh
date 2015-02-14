@@ -11,9 +11,11 @@ fi
 
 sha1="$(curl -sSL "https://wordpress.org/wordpress-$upstream.tar.gz.sha1")"
 
-set -x
-sed -ri '
-	s/^(ENV WORDPRESS_VERSION) .*/\1 '"$current"'/;
-	s/^(ENV WORDPRESS_UPSTREAM_VERSION) .*/\1 '"$upstream"'/;
-	s/^(ENV WORDPRESS_SHA1) .*/\1 '"$sha1"'/;
-' Dockerfile
+for variant in apache fpm; do
+	set -x
+	sed -ri '
+		s/^(ENV WORDPRESS_VERSION) .*/\1 '"$current"'/;
+		s/^(ENV WORDPRESS_UPSTREAM_VERSION) .*/\1 '"$upstream"'/;
+		s/^(ENV WORDPRESS_SHA1) .*/\1 '"$sha1"'/;
+	' "$variant/Dockerfile"
+done
