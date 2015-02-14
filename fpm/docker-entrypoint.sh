@@ -1,9 +1,20 @@
 #!/bin/bash
 set -e
 
-if [ -z "$MYSQL_PORT_3306_TCP" ]; then
-	echo >&2 'error: missing MYSQL_PORT_3306_TCP environment variable'
-	echo >&2 '  Did you forget to --link some_mysql_container:mysql ?'
+if [ -n "$MYSQL_PORT_3306_TCP" ]; then
+	if [ -z "$WORDPRESS_DB_HOST" ]; then
+		WORDPRESS_DB_HOST='mysql'
+	else
+		echo >&2 'warning: both WORDPRESS_DB_HOST and MYSQL_PORT_3306_TCP found'
+		echo >&2 "  Connecting to WORDPRESS_DB_HOST ($WORDPRESS_DB_HOST)"
+		echo >&2 '  instead of the linked mysql container'
+	fi
+fi
+
+if [ -z "$WORDPRESS_DB_HOST" ]; then
+	echo >&2 'error: missing WORDPRESS_DB_HOST and MYSQL_PORT_3306_TCP environment variables'
+	echo >&2 '  Did you forget to --link some_mysql_container:mysql or set an external db'
+	echo >&2 '  with -e WORDPRESS_DB_HOST=hostname:port?'
 	exit 1
 fi
 
@@ -53,8 +64,6 @@ set_config() {
 	sed_escaped_value="$(echo "$php_escaped_value" | sed 's/[\/&]/\\&/g')"
 	sed -ri "s/((['\"])$key\2\s*,\s*)(['\"]).*\3/\1$sed_escaped_value/" wp-config.php
 }
-
-WORDPRESS_DB_HOST='mysql'
 
 set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
 set_config 'DB_USER' "$WORDPRESS_DB_USER"
