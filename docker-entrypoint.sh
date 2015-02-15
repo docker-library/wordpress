@@ -44,6 +44,7 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 	echo >&2 "Complete! WordPress has been successfully copied to $(pwd)"
 	if [ ! -e .htaccess ]; then
 		cat > .htaccess <<-'EOF'
+			Options -Indexes
 			RewriteEngine On
 			RewriteBase /
 			RewriteRule ^index\.php$ - [L]
