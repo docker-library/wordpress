@@ -42,6 +42,16 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 	fi
 	tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
 	echo >&2 "Complete! WordPress has been successfully copied to $(pwd)"
+	if [ ! -e .htaccess ]; then
+		cat > .htaccess <<-'EOF'
+			RewriteEngine On
+			RewriteBase /
+			RewriteRule ^index\.php$ - [L]
+			RewriteCond %{REQUEST_FILENAME} !-f
+			RewriteCond %{REQUEST_FILENAME} !-d
+			RewriteRule . /index.php [L]
+		EOF
+	fi
 fi
 
 # TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
