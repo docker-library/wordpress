@@ -43,6 +43,7 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 	tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
 	echo >&2 "Complete! WordPress has been successfully copied to $(pwd)"
 	if [ ! -e .htaccess ]; then
+		# NOTE: The "Indexes" option is disabled in the php:apache base image
 		cat > .htaccess <<-'EOF'
 			RewriteEngine On
 			RewriteBase /
