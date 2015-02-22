@@ -51,6 +51,7 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 			RewriteCond %{REQUEST_FILENAME} !-f
 			RewriteCond %{REQUEST_FILENAME} !-d
 			RewriteRule . /index.php [L]
+			Options -Indexes
 		EOF
 	fi
 fi
