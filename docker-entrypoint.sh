@@ -56,6 +56,7 @@ if ! [ -e index.php -a -e wp-includes/version.php ]; then
 			</IfModule>
 			# END WordPress
 		EOF
+		chown www-data:www-data .htaccess
 	fi
 fi
 
@@ -70,6 +71,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 }
 
 EOPHP
+	chown www-data:www-data wp-config.php
 fi
 
 set_config() {
@@ -139,7 +141,5 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 
 $mysql->close();
 EOPHP
-
-chown -R www-data:www-data .
 
 exec "$@"
