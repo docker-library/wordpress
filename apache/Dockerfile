@@ -10,9 +10,9 @@ RUN docker-php-ext-install mysqli
 
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 4.2.3
-ENV WORDPRESS_UPSTREAM_VERSION 4.2.3
-ENV WORDPRESS_SHA1 5a77cc0d0399c4e058d1f1e4a628b951f523042e
+ENV WORDPRESS_VERSION 4.2.4
+ENV WORDPRESS_UPSTREAM_VERSION 4.2.4
+ENV WORDPRESS_SHA1 9c90d175e0e64f51681101058a820cd76475949a
 
 # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
 RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_UPSTREAM_VERSION}.tar.gz \
