@@ -11,12 +11,12 @@ VOLUME /var/www/html
 ENV WORDPRESS_VERSION 4.2.4
 ENV WORDPRESS_SHA1 9c90d175e0e64f51681101058a820cd76475949a
 
-# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
+# upstream tarballs include ./wordpress/ so we strip that part with --strip-components
 RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
 	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
-	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
+	&& tar -xvf wordpress.tar.gz --directory /var/www/html --strip-components 1 \
 	&& rm wordpress.tar.gz \
-	&& chown -R www-data:www-data /usr/src/wordpress
+	&& chown -R www-data:www-data /var/www/html
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
