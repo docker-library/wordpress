@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [[ "$1" == apache2* ]] || [[ "$1" == php-fpm ]]; then
+if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	if [ -n "$MYSQL_PORT_3306_TCP" ]; then
 		if [ -z "$WORDPRESS_DB_HOST" ]; then
 			WORDPRESS_DB_HOST='mysql'
