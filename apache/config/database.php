@@ -70,7 +70,7 @@ return [
             'port'     => getenv('POSTGRES_PORT_5432_TCP_PORT') ?: '',
             'database' => getenv('OCTOBER_DB_NAME') ?: 'october_cms',
             'username' => getenv('POSTGRES_USER') ?: 'postgres',
-            'password' => getenv('POSTGRES_PASSWORDs') ?: '',
+            'password' => getenv('POSTGRES_PASSWORD') ?: '',
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
