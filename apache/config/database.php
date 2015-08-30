@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => 'mysql',
+    'default' => getenv('OCTOBER_DB_DRIVER') ?: 'mysql',
 
     /*
     |--------------------------------------------------------------------------
@@ -55,10 +55,10 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => getenv('MYSQL_PORT_3306_TCP_ADDR') ?: 'localhost',
-            'port'      => getenv('MYSQL_PORT_3306_TCP_PORT') ?: 3306,
-            'database'  => 'october_cms',
-            'username'  => 'root',
-            'password'  => getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD'),
+            'port'      => getenv('MYSQL_PORT_3306_TCP_PORT') ?: '',
+            'database'  => getenv('OCTOBER_DB_NAME') ?: 'october_cms',
+            'username'  => getenv('OCTOBER_DB_USER') ?: 'root',
+            'password'  => getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD') ?: '',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
@@ -66,11 +66,11 @@ return [
 
         'pgsql' => [
             'driver'   => 'pgsql',
-            'host'     => 'localhost',
-            'port'     => '',
-            'database' => 'database',
-            'username' => 'root',
-            'password' => '',
+            'host'     => getenv('POSTGRES_PORT_5432_TCP_ADDR') ?: 'localhost',
+            'port'     => getenv('POSTGRES_PORT_5432_TCP_PORT') ?: '',
+            'database' => getenv('OCTOBER_DB_NAME') ?: 'october_cms',
+            'username' => getenv('POSTGRES_USER') ?: 'postgres',
+            'password' => getenv('POSTGRES_PASSWORDs') ?: '',
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
