@@ -75,9 +75,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
 		$_SERVER['HTTPS'] = 'on';
 	}
-	
+	foreach (glob("/etc/wordpress/*.php") as $filename)
+	{
+		include $filename;
+	}
 	EOPHP
-	[ -n "$WP_ALLOW_MULTISITE" ] && echo "define( 'WP_ALLOW_MULTISITE', true );"
 	}
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
