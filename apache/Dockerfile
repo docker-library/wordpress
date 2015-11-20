@@ -17,11 +17,12 @@ ENV WORDPRESS_SHA1 b2e5652a6d2333cabe7b37459362a3e5b8b66221
 RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
 	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
 	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
-	&& rm wordpress.tar.gz \
-	&& chown -R www-data:www-data /usr/src/wordpress
+	&& rm wordpress.tar.gz
 
 # install language files
 RUN curl -s https://he.wordpress.org/wordpress-4.3.1-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
+
+RUN chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
