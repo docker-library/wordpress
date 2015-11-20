@@ -20,6 +20,9 @@ RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VER
 	&& rm wordpress.tar.gz \
 	&& chown -R www-data:www-data /usr/src/wordpress
 
+# install language files
+RUN curl -s https://he.wordpress.org/wordpress-4.3.1-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
+
 COPY docker-entrypoint.sh /entrypoint.sh
 
 # grr, ENTRYPOINT resets CMD now
