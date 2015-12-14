@@ -83,16 +83,19 @@ EOPHP
 		echo "$@" | sed 's/[\/&]/\\&/g'
 	}
 	php_escape() {
-		php -r 'var_export((string) $argv[1]);' "$1"
+		php -r 'var_export(('$2') $argv[1]);' "$1"
 	}
 	set_config() {
 		key="$1"
 		value="$2"
-		regex="(['\"])$(sed_escape_lhs "$key")\2\s*,"
+		var_type="${3:-string}"
+		start="(['\"])$(sed_escape_lhs "$key")\2\s*,"
+		end="\);"
 		if [ "${key:0:1}" = '$' ]; then
-			regex="^(\s*)$(sed_escape_lhs "$key")\s*="
+			start="^(\s*)$(sed_escape_lhs "$key")\s*="
+			end=";"
 		fi
-		sed -ri "s/($regex\s*)(['\"]).*\3/\1$(sed_escape_rhs "$(php_escape "$value")")/" wp-config.php
+		sed -ri "s/($start\s*).*($end)$/\1$(sed_escape_rhs "$(php_escape "$value" "$var_type")")\3/" wp-config.php
 	}
 
 	set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
@@ -127,6 +130,10 @@ EOPHP
 
 	if [ "$WORDPRESS_TABLE_PREFIX" ]; then
 		set_config '$table_prefix' "$WORDPRESS_TABLE_PREFIX"
+	fi
+
+	if [ "$WORDPRESS_DEBUG" ]; then
+		set_config 'WP_DEBUG' 1 boolean
 	fi
 
 	TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
