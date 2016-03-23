@@ -40,6 +40,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		group="$(id -g)"
 	fi
 
+    # allow use subdirectory in the wordpress site url and home configs, like: http://localhost/blog
+	if ! [ -z "$WORDPRESS_SUBDIRECTORY" ]; then
+        mkdir -p $WORDPRESS_SUBDIRECTORY
+        cd $WORDPRESS_SUBDIRECTORY
+    fi
+
 	if ! [ -e index.php -a -e wp-includes/version.php ]; then
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ "$(ls -A)" ]; then
