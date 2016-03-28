@@ -13,7 +13,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         fi
 
         if [ -z "$OCTOBER_DB_HOST" ]; then
-                echo >&2 'error: missing OCTOBER_DB_HOST and MYSQL_PORT_3306_TCP environment variables'
+                echo >&2 'error: missing OCTOBER_DB_HOST environment variables'
                 echo >&2 '  Did you forget to --link some_mysql_container:mysql or set an external db'
                 echo >&2 '  with -e OCTOBER_DB_HOST=hostname:port?'
                 exit 1
