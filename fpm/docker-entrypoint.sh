@@ -12,7 +12,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                         echo >&2 '  instead of the linked mysql container'
                 fi
                 export OCTOBER_DB_DRIVER='mysql'
-
+                : ${OCTOBER_DB_PORT:=${MYSQL_PORT_3306_TCP_PORT:-3306}}
                 # if we're linked to MySQL, and we're using the root user, and our linked
                 # container has a default "root" password set up and passed through... :)
                 : ${OCTOBER_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}
@@ -30,10 +30,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                         echo >&2 '  instead of the linked postgres container'
                 fi
                 export OCTOBER_DB_DRIVER='pgsql'
-
+                : ${OCTOBER_DB_PORT:=${POSTGRES_PORT_5432_TCP_PORT:-5432}}
                 # if we're linked to Postgres, get the user-configured username or default 'postgres'
                 : ${OCTOBER_DB_USER:=${POSTGRES_ENV_POSTGRES_USER:-postgres}}
-                : ${OCTOBER_DB_PASSWORD:=${POSTGRES_ENV_POSTGRES_PASSWORD}}
+                : ${OCTOBER_DB_PASSWORD:=$POSTGRES_ENV_POSTGRES_PASSWORD}
 
         fi
 
@@ -67,6 +67,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 echo >&2 "Complete! OctoberCMS has been successfully copied to $(pwd)"
         fi
 
+
 TERM=dumb php -- "$OCTOBER_DB_HOST" "$OCTOBER_DB_PORT" "$OCTOBER_DB_USER" "$OCTOBER_DB_PASSWORD" "$OCTOBER_DB_NAME" <<'EOPHP'
 <?php
 $host = $argv[1];
@@ -75,23 +76,48 @@ $dbuser = $argv[3];
 $dbpass = $argv[4];
 $dbname = $argv[5];
 
+$retries = 10;
+
 switch(getenv('OCTOBER_DB_DRIVER')) {
   case 'mysql':
-    $pdo = new PDO("mysql:host=$host;", $dbuser, $dbpass);
-    $pdo->query("CREATE DATABASE IF NOT EXISTS $dbname");
+    while ($retries > 0)
+    {
+      try {
+        $pdo = new PDO("mysql:host=$host;port=$port", $dbuser, $dbpass);
+        $pdo->query("CREATE DATABASE IF NOT EXISTS $dbname");
+        $retries = 0;
+      } catch (PDOException $e) {
+        $retries--;
+        sleep(3);
+      }
+    }
     break;
   case 'pgsql':
-    $pdo = new PDO("pgsql:host=$host;", $dbuser ,$dbpass);
-    // Postgres version of "CREATE DATABASE IF NOT EXISTS"
-    $res = $pdo->query("select count(*) from pg_catalog.pg_database where datname = '$dbname';");
-    if($res->fetchColumn() < 1)
-      $pdo->query("CREATE DATABASE $dbname");
+    while ($retries > 0)
+    {
+      try {
+        $pdo = new PDO("pgsql:host=$host;port=$port", $dbuser, $dbpass);
+        // Postgres version of "CREATE DATABASE IF NOT EXISTS"
+        $res = $pdo->query("select count(*) from pg_catalog.pg_database where datname = '$dbname';");
+        if($res->fetchColumn() < 1)
+          $pdo->query("CREATE DATABASE $dbname");
+
+        $retries = 0;
+      } catch (PDOException $e) {
+        $retries--;
+        sleep(3);
+      }
+    }
     break;
   default:
     $pdo = new PDO("sqlite:storage/database.sqlite");
     break;
 }
 EOPHP
+
+# Export the variables so we can use them in config files
+export OCTOBER_DB_HOST OCTOBER_DB_PORT OCTOBER_DB_USER OCTOBER_DB_PASSWORD OCTOBER_DB_NAME
+
 php artisan october:up
 
 chown -R www-data:www-data /var/www/html
