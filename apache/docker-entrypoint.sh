@@ -131,11 +131,16 @@ EOPHP
 
 $stderr = fopen('php://stderr', 'w');
 
-list($host, $port) = explode(':', $argv[1], 2);
+list($host, $port_or_socket) = explode(':', $argv[1], 2);
+if ( 0 !== strpos( $port_or_socket, '/' ) ) {
+  $port = (int)$port_or_socket;
+} else {
+  $socket = $port_or_socket;
+}
 
 $maxTries = 10;
 do {
-	$mysql = new mysqli($host, $argv[2], $argv[3], '', (int)$port);
+	$mysql = new mysqli($host, $argv[2], $argv[3], '', $port, $socket);
 	if ($mysql->connect_error) {
 		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
 		--$maxTries;
