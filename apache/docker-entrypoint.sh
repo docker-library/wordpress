@@ -67,6 +67,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 echo >&2 "Complete! OctoberCMS has been successfully copied to $(pwd)"
         fi
 
+        # Generate random key for this container if it's not specified
+        if [ -n "$OCTOBER_KEY" ]; then
+          export OCTOBER_KEY = "$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
+        fi
 
 TERM=dumb php -- "$OCTOBER_DB_HOST" "$OCTOBER_DB_PORT" "$OCTOBER_DB_USER" "$OCTOBER_DB_PASSWORD" "$OCTOBER_DB_NAME" <<'EOPHP'
 <?php
