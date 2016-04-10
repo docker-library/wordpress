@@ -114,6 +114,12 @@ Most of the configuration settings can be set through environment variables.  Th
 ### SERVICES settings
 * `-e OCTOBER_SERVICES_MAILGUN_DOMAIN=...` (defaults to `''`)
 * `-e OCTOBER_SERVICES_MAILGUN_SECRET=...` (defaults to `''`)
+* `-e OCTOBER_SERVICES_MANDRILL_SECRET=...` (defaults to `''`)
+* `-e OCTOBER_SERVICES_SES_KEY=...` (defaults to `''`)
+* `-e OCTOBER_SERVICES_SES_SECRET=...` (defaults to `''`)
+* `-e OCTOBER_SERVICES_SES_REGION=...` (defaults to `'us-east-1'`)
+* `-e OCTOBER_SERVICES_STRIPE_MODEL=...` (defaults to `'User'`)
+* `-e OCTOBER_SERVICES_STRIPE_SECRET=...` (defaults to `''`)
 
 
 ## Notes
