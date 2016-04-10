@@ -117,9 +117,9 @@ return [
         'cluster' => false,
 
         'default' => [
-            'host'     => getenv('OCTOBER_REDIS_HOST') ?: '127.0.0.1',
-            'port'     => getenv('OCTOBER_REDIS_PORT') ?: 6379,
-            'database' => getenv('OCTOBER_REDIS_NAME') ?: 'october_cms',
+            'host'     => getenv('REDIS_PORT_6379_TCP_ADDR') ?: '127.0.0.1',
+            'port'     => getenv('REDIS_PORT_6379_TCP_PORT') ?: 6379,
+            'database' => 'october_cms',
         ],
 
     ],
