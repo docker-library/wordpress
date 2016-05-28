@@ -3,7 +3,7 @@ FROM php:5.6-apache
 RUN a2enmod rewrite expires
 
 # install the PHP extensions we need
-RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev patch && rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
 	&& docker-php-ext-install gd mysqli opcache
 
@@ -29,6 +29,12 @@ RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VER
 	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
 	&& rm wordpress.tar.gz \
 	&& chown -R www-data:www-data /usr/src/wordpress
+
+# install functions.php which changes how is_ssl is called so we can glue
+# an SSL terminating container in front
+RUN mkdir /patch
+COPY is_ssl.patch /patch
+RUN cd /usr/src/wordpress && patch wp-includes/functions.php < /patch/is_ssl.patch
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
