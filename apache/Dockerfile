@@ -21,7 +21,7 @@ RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VER
 	&& rm wordpress.tar.gz
 
 # install language files
-RUN curl -s https://he.wordpress.org/wordpress-4.3.1-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
+RUN curl -s https://he.wordpress.org/wordpress-${WORDPRESS_VERSION}-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
 
 RUN chown -R www-data:www-data /usr/src/wordpress
 
