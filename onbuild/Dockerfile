@@ -25,6 +25,8 @@ ADD config/*.php /tmp/config/
 
 ADD docker-entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
+
 ONBUILD ADD . /usr/src/october
 
 ONBUILD RUN cd /usr/src/october \
