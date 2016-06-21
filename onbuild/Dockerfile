@@ -18,22 +18,25 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-VOLUME /var/www/html
-
 RUN curl -sS https://getcomposer.org/installer | php \
         && mv composer.phar /usr/local/bin/composer
 
-ONBUILD COPY . /usr/src/october
+ADD config/*.php /tmp/config/
+
+ADD docker-entrypoint.sh /entrypoint.sh
+
+ONBUILD ADD . /usr/src/october
 
 ONBUILD RUN cd /usr/src/october \
-      && composer install --no-interaction --prefer-dist
+      && composer install --no-interaction --prefer-dist \
+      && cp /tmp/config/*.php config/
 
-COPY config/*.php /usr/src/october/config/
+ONBUILD RUN chown -R www-data:www-data /usr/src/october
 
-RUN chown -R www-data:www-data /usr/src/october
+ONBUILD VOLUME /var/www/html
 
-COPY docker-entrypoint.sh /entrypoint.sh
+ONBUILD WORKDIR /var/www/html
 
-ENTRYPOINT ["/entrypoint.sh"]
+ONBUILD ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["apache2-foreground"]
+ONBUILD CMD ["apache2-foreground"]
