@@ -125,6 +125,19 @@ export OCTOBER_DB_HOST OCTOBER_DB_PORT OCTOBER_DB_USER OCTOBER_DB_PASSWORD OCTOB
 
 php artisan october:up
 
+# Install plugins if they are identified
+IFS=';' read -ra PLUGIN <<< "$OCTOBER_PLUGINS"
+for i in "${PLUGIN[@]}"; do
+    php artisan plugin:install $i
+done
+
+# Install themes if they are identified
+IFS=';' read -ra THEME <<< "$OCTOBER_THEMES"
+for i in "${THEME[@]}"; do
+    php artisan theme:install $i
+done
+
+
 chown -R www-data:www-data /var/www/html
 
 fi

@@ -58,6 +58,13 @@ The following environment variables are honored for configuring your October ins
 * `-e OCTOBER_DB_PASSWORD=...` (defaults to the password for the user of the linked database container)
 * `-e OCTOBER_DB_NAME=...` (defaults to `october_cms`)
 
+## Themes and Plugins
+Themes and/or plugins can be installed from the marketplace with the following environment variables:
+* `-e OCTOBER_THEMES=...` (defaults to null)
+* `-e OCTOBER_PLUGINS=...` (defaults to null)
+
+Use semicolon separated list for multiple themes or plugins (e.g. `-e OCTOBER_PLUGINS="RainLab.Blog;RainLab.GoogleAnalytics"`)
+
 ## Other Environment Variables
 Most of the configuration settings can be set through environment variables.  The format always starts with `OCTOBER_` and then the configuration file name (e.g. `APP_`), and then the property name (e.g. `DEBUG`).  Property names that are camel case are split by the underscore, as are any sub properties.  Please refer to the configuration files for more detailed explanations and for valid settings.
 
@@ -123,8 +130,6 @@ Most of the configuration settings can be set through environment variables.  Th
 
 
 ## Notes
-Work on this image is ongoing, and I intend to support more environment variables to allow the user to configure more of their October instance.  Some things on my list include:
-
-* Support for automating the installation of plugins and themes (again for HA)
+Work on this image is ongoing, and I intend to support more environment variables to allow the user to configure more of their October instance.
 
 Please let me know what else you'd like to see.
