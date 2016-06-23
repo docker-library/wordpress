@@ -2,30 +2,14 @@
 set -e
 
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
-	if [ -n "$MYSQL_PORT_3306_TCP" ]; then
-		if [ -z "$WORDPRESS_DB_HOST" ]; then
-			WORDPRESS_DB_HOST='mysql'
-		else
-			echo >&2 'warning: both WORDPRESS_DB_HOST and MYSQL_PORT_3306_TCP found'
-			echo >&2 "  Connecting to WORDPRESS_DB_HOST ($WORDPRESS_DB_HOST)"
-			echo >&2 '  instead of the linked mysql container'
-		fi
-	fi
-
-	if [ -z "$WORDPRESS_DB_HOST" ]; then
-		echo >&2 'error: missing WORDPRESS_DB_HOST and MYSQL_PORT_3306_TCP environment variables'
-		echo >&2 '  Did you forget to --link some_mysql_container:mysql or set an external db'
-		echo >&2 '  with -e WORDPRESS_DB_HOST=hostname:port?'
-		exit 1
-	fi
-
-	# if we're linked to MySQL, and we're using the root user, and our linked
-	# container has a default "root" password set up and passed through... :)
-	: ${WORDPRESS_DB_USER:=root}
+	: "${WORDPRESS_DB_HOST:=mysql}"
+	# if we're linked to MySQL and thus have credentials already, let's use them
+	: ${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}
 	if [ "$WORDPRESS_DB_USER" = 'root' ]; then
 		: ${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}
 	fi
-	: ${WORDPRESS_DB_NAME:=wordpress}
+	: ${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_PASSWORD}
+	: ${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}
 
 	if [ -z "$WORDPRESS_DB_PASSWORD" ]; then
 		echo >&2 'error: missing required WORDPRESS_DB_PASSWORD environment variable'
@@ -84,6 +68,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
+	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
+	# https://github.com/docker-library/wordpress/issues/116
+	# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
+	sed -ri 's/\r\n|\r/\n/g' wp-config*
+
 	if [ ! -e wp-config.php ]; then
 		awk '/^\/\*.*stop editing.*\*\/$/ && c == 0 { c = 1; system("cat") } { print }' wp-config-sample.php > wp-config.php < <(additional_config)
 		chown www-data:www-data wp-config.php
@@ -97,16 +86,19 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		echo "$@" | sed 's/[\/&]/\\&/g'
 	}
 	php_escape() {
-		php -r 'var_export((string) $argv[1]);' "$1"
+		php -r 'var_export(('$2') $argv[1]);' "$1"
 	}
 	set_config() {
 		key="$1"
 		value="$2"
-		regex="(['\"])$(sed_escape_lhs "$key")\2\s*,"
+		var_type="${3:-string}"
+		start="(['\"])$(sed_escape_lhs "$key")\2\s*,"
+		end="\);"
 		if [ "${key:0:1}" = '$' ]; then
-			regex="^(\s*)$(sed_escape_lhs "$key")\s*="
+			start="^(\s*)$(sed_escape_lhs "$key")\s*="
+			end=";"
 		fi
-		sed -ri "s/($regex\s*)(['\"]).*\3/\1$(sed_escape_rhs "$(php_escape "$value")")/" wp-config.php
+		sed -ri "s/($start\s*).*($end)$/\1$(sed_escape_rhs "$(php_escape "$value" "$var_type")")\3/" wp-config.php
 	}
 
 	set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
@@ -141,6 +133,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
 	if [ "$WORDPRESS_TABLE_PREFIX" ]; then
 		set_config '$table_prefix' "$WORDPRESS_TABLE_PREFIX"
+	fi
+
+	if [ "$WORDPRESS_DEBUG" ]; then
+		set_config 'WP_DEBUG' 1 boolean
 	fi
 
 	TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
