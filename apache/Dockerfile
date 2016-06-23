@@ -1,4 +1,4 @@
-FROM php:5.6-apache
+FROM php:7.0-apache
 
 RUN a2enmod rewrite
 
@@ -11,8 +11,8 @@ RUN docker-php-ext-install mysqli
 
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 4.5.2
-ENV WORDPRESS_SHA1 bab94003a5d2285f6ae76407e7b1bbb75382c36e
+ENV WORDPRESS_VERSION 4.5.3
+ENV WORDPRESS_SHA1 835b68748dae5a9d31c059313cd0150f03a49269
 
 # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
 RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
@@ -21,7 +21,7 @@ RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VER
 	&& rm wordpress.tar.gz
 
 # install language files
-RUN curl -s https://he.wordpress.org/wordpress-4.3.1-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
+RUN curl -s https://he.wordpress.org/wordpress-${WORDPRESS_VERSION}-he_IL.tar.gz | tar -zx -C /usr/src/ --wildcards 'wordpress/wp-content/languages/*'
 
 RUN chown -R www-data:www-data /usr/src/wordpress
 
