@@ -20,6 +20,9 @@ RUN { \
 
 VOLUME /var/www/html
 
+RUN curl -sS https://getcomposer.org/installer | php \
+        && mv composer.phar /usr/local/bin/composer
+
 RUN mkdir /usr/src/october && cd /usr/src/october && curl -s https://octobercms.com/api/installer | php
 
 COPY config/*.php /usr/src/october/config/

@@ -67,6 +67,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 echo >&2 "Complete! OctoberCMS has been successfully copied to $(pwd)"
         fi
 
+        # if we have a clean repo then install
+        if ! [ -d vendor ]; then
+          composer install
+        fi
+
         # Generate random key for this container if it's not specified
         if [ -n "$OCTOBER_KEY" ]; then
           export OCTOBER_KEY = "$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
