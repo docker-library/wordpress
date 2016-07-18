@@ -131,11 +131,15 @@ EOPHP
 
 $stderr = fopen('php://stderr', 'w');
 
-list($host, $port_or_socket) = explode(':', $argv[1], 2);
-if ( 0 !== strpos( $port_or_socket, '/' ) ) {
-  $port = (int)$port_or_socket;
-} else {
-  $socket = $port_or_socket;
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Alternate_Port
+//   "hostname:port"
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Sockets_or_Pipes
+//   "hostname:unix-socket-path"
+list($host, $socket) = explode(':', $argv[1], 2);
+$port = 0;
+if (is_numeric($socket)) {
+	$port = (int) $socket;
+	$socket = null;
 }
 
 $maxTries = 10;
