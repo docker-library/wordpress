@@ -131,11 +131,20 @@ EOPHP
 
 $stderr = fopen('php://stderr', 'w');
 
-list($host, $port) = explode(':', $argv[1], 2);
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Alternate_Port
+//   "hostname:port"
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Sockets_or_Pipes
+//   "hostname:unix-socket-path"
+list($host, $socket) = explode(':', $argv[1], 2);
+$port = 0;
+if (is_numeric($socket)) {
+	$port = (int) $socket;
+	$socket = null;
+}
 
 $maxTries = 10;
 do {
-	$mysql = new mysqli($host, $argv[2], $argv[3], '', (int)$port);
+	$mysql = new mysqli($host, $argv[2], $argv[3], '', $port, $socket);
 	if ($mysql->connect_error) {
 		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
 		--$maxTries;
