@@ -50,7 +50,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 	# https://github.com/docker-library/wordpress/issues/116
 	# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
-	sed -ri 's/\r\n|\r/\n/g' wp-config*
+	sed -ri -e 's/\r\n|\r/\n/g' wp-config*
 
 	if [ ! -e wp-config.php ]; then
 		awk '/^\/\*.*stop editing.*\*\/$/ && c == 0 { c = 1; system("cat") } { print }' wp-config-sample.php > wp-config.php <<'EOPHP'
@@ -66,13 +66,13 @@ EOPHP
 
 	# see http://stackoverflow.com/a/2705678/433558
 	sed_escape_lhs() {
-		echo "$@" | sed 's/[]\/$*.^|[]/\\&/g'
+		echo "$@" | sed -e 's/[]\/$*.^|[]/\\&/g'
 	}
 	sed_escape_rhs() {
-		echo "$@" | sed 's/[\/&]/\\&/g'
+		echo "$@" | sed -e 's/[\/&]/\\&/g'
 	}
 	php_escape() {
-		php -r 'var_export(('$2') $argv[1]);' "$1"
+		php -r 'var_export(('$2') $argv[1]);' -- "$1"
 	}
 	set_config() {
 		key="$1"
@@ -84,7 +84,7 @@ EOPHP
 			start="^(\s*)$(sed_escape_lhs "$key")\s*="
 			end=";"
 		fi
-		sed -ri "s/($start\s*).*($end)$/\1$(sed_escape_rhs "$(php_escape "$value" "$var_type")")\3/" wp-config.php
+		sed -ri -e "s/($start\s*).*($end)$/\1$(sed_escape_rhs "$(php_escape "$value" "$var_type")")\3/" wp-config.php
 	}
 
 	set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
@@ -110,7 +110,7 @@ EOPHP
 			set_config "$unique" "$unique_value"
 		else
 			# if not specified, let's generate a random value
-			current_set="$(sed -rn "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
+			current_set="$(sed -rn -e "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
 			if [ "$current_set" = 'put your unique phrase here' ]; then
 				set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
 			fi
