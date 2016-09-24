@@ -43,6 +43,14 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			EOF
 			chown www-data:www-data .htaccess
 		fi
+	else
+		CONTAINER_WORDPRESS_VERSION=$(php -r "include('/usr/src/wordpress/wp-includes/version.php'); echo \$wp_version;")
+		INSTALLED_WORDPRESS_VERSION=$(php -r "include('wp-includes/version.php'); echo \$wp_version;")
+		if ! [ "$CONTAINER_WORDPRESS_VERSION" == "$INSTALLED_WORDPRESS_VERSION" ]; then
+			echo >&2 "Upgrading Wordpress from $INSTALLED_WORDPRESS_VERSION to $CONTAINER_WORDPRESS_VERSION"
+			tar cf - --one-file-system -C /usr/src/wordpress --exclude=wp-content . | tar xf -
+			echo >&2 "Complete! WordPress has been successfully upgraded to $(pwd)"
+		fi
 	fi
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
