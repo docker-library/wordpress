@@ -19,8 +19,8 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 RUN { \
-		echo 'upload_max_size=64M'; \
-		echo 'post_max_size=64M'; \
+		echo 'upload_max_filesize=128M'; \
+		echo 'post_max_size=128M'; \
 		echo 'max_execution_time=600'; \
 	} > /usr/local/etc/php/conf.d/filelimits.ini
 
