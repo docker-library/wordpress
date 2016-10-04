@@ -18,6 +18,13 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+RUN { \
+		echo 'upload_max_size=64M'; \
+		echo 'post_max_size=64M'; \
+		echo 'max_execution_time=600'; \
+	} > /usr/local/etc/php/conf.d/filelimits.ini
+
+
 VOLUME /var/www/html
 
 ENV WORDPRESS_VERSION 4.6.1
