@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# Alias for WP-cli to include arguments that we want to use everywhere
+shopt -s expand_aliases
+alias wp="wp --path=$DOCUMENT_ROOT --allow-root"
+
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	: "${WORDPRESS_DB_HOST:=mysql}"
 	# if we're linked to MySQL and thus have credentials already, let's use them
@@ -45,7 +49,13 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 	fi
 
-	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
+	# handle WordPress upgrades magically with wp-cli
+	# can be set through env on runtime or arg on build time
+	# defaults to WP_VERSION=latest
+	if [ wp core is-installed ]; then
+		wp core update --version=$WP_VERSION
+		# TODO handle plugin updates
+	fi
 
 	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 	# https://github.com/docker-library/wordpress/issues/116
