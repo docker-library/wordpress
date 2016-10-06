@@ -1,9 +1,9 @@
 #!/bin/bash
-set -eo pipefail
+set -euo pipefail
 
-current="$(curl -sSL 'http://api.wordpress.org/core/version-check/1.7/' | sed -r 's/^.*"current":"([^"]+)".*$/\1/')"
+current="$(curl -fsSL 'http://api.wordpress.org/core/version-check/1.7/' | jq -r '.offers[0].current')"
 
-sha1="$(curl -sSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
+sha1="$(curl -fsSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
 
 travisEnv=
 for variant in apache fpm; do
