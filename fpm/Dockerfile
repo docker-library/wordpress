@@ -1,9 +1,16 @@
 FROM php:5.6-fpm
 
+ARG php_ext
+ARG wp_version=latest
+ARG wp_locale=en_US
+
+ENV WP_BUILD_VERSION wp_version
+ENV WP_BUILD_LOCALE wp_locale
+
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
 	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-install gd mysqli opcache
+	&& docker-php-ext-install gd mysqli opcache $php_ext
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -18,17 +25,16 @@ RUN { \
 
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 4.6.1
-ENV WORDPRESS_SHA1 027e065d30a64720624a7404a1820e6c6fff1202
+RUN curl -o /usr/local/bin/wp -SL https://github.com/wp-cli/wp-cli/releases/download/v0.24.1/wp-cli-0.24.1.phar \
+	&& chmod +x /usr/local/bin/wp \
+	&& wp --info --allow-root
 
-# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
-RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
-	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
-	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
-	&& rm wordpress.tar.gz \
+RUN wp core download --path=/usr/src/wordpress --locale=$wp_locale --version=$wp_version --allow-root \
 	&& chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /entrypoint.sh
+
+WORKDIR /var/www/html
 
 # grr, ENTRYPOINT resets CMD now
 ENTRYPOINT ["/entrypoint.sh"]
