@@ -7,10 +7,7 @@ defaultVariant='apache'
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-phpVersions=( "$@" )
-if [ ${#phpVersions[@]} -eq 0 ]; then
-	phpVersions=( php*.*/ )
-fi
+phpVersions=( php*.*/ )
 phpVersions=( "${phpVersions[@]%/}" )
 
 # get the most recent commit which modified any of "$@"
