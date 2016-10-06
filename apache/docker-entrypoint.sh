@@ -54,7 +54,18 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	# defaults to WP_VERSION=latest
 	if [ wp core is-installed ]; then
 		wp core update --version=$WP_VERSION
-		# TODO handle plugin updates
+
+		# update all plugins
+		wp plugin update --all
+
+		# install plugins provided in the WORDPRESS_PLUGINS env variable
+		if [ "$WORDPRESS_PLUGINS" ]; then
+			for $plugin in $WORDPRESS_PLUGINS; do 
+				if ! $(wp plugin is-installed ${plugin}); then
+					wp plugin install $plugin
+				fi
+			done 
+		fi
 	fi
 
 	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
