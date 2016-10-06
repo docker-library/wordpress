@@ -87,13 +87,14 @@ for phpVersion in "${phpVersions[@]}"; do
 				fullAliases+=( "${versionAliases[@]}" )
 			fi
 		fi
-		if [ "$variant" = "$defaultVariant" ]; then
-			fullAliases+=( "${phpVersionAliases[@]}" )
-		fi
 
 		fullAliases+=(
 			"${phpVersionVariantAliases[@]}"
 		)
+
+		if [ "$variant" = "$defaultVariant" ]; then
+			fullAliases+=( "${phpVersionAliases[@]}" )
+		fi
 
 		echo
 		cat <<-EOE
