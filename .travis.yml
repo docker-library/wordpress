@@ -2,8 +2,10 @@ language: bash
 services: docker
 
 env:
-  - VARIANT=apache
-  - VARIANT=fpm
+  - VARIANT=php5.6/apache
+  - VARIANT=php5.6/fpm
+  - VARIANT=php7.0/apache
+  - VARIANT=php7.0/fpm
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
@@ -11,7 +13,7 @@ install:
 before_script:
   - env | sort
   - cd "$VARIANT"
-  - image="wordpress:$VARIANT"
+  - slash='/'; image="wordpress:${VARIANT//$slash/-}"
 
 script:
   - docker build -t "$image" .

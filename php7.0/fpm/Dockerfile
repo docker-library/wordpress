@@ -1,6 +1,4 @@
-FROM php:5.6-apache
-
-RUN a2enmod rewrite expires
+FROM php:7.0-fpm
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
@@ -23,15 +21,17 @@ VOLUME /var/www/html
 ENV WORDPRESS_VERSION 4.6.1
 ENV WORDPRESS_SHA1 027e065d30a64720624a7404a1820e6c6fff1202
 
-# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
-RUN curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz \
+RUN set -x \
+	&& curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz" \
 	&& echo "$WORDPRESS_SHA1 *wordpress.tar.gz" | sha1sum -c - \
+# upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
 	&& tar -xzf wordpress.tar.gz -C /usr/src/ \
 	&& rm wordpress.tar.gz \
 	&& chown -R www-data:www-data /usr/src/wordpress
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
-# grr, ENTRYPOINT resets CMD now
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+# ENTRYPOINT resets CMD
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]
