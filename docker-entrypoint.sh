@@ -10,7 +10,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 	: ${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_PASSWORD}
 	: ${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}
-
+  # If the value of WORDPRESS_DB_PASSWORD is a file that exists within
+  # the container, read the contents of that file (useful if using
+  # Docker-managed secrets)
+  if [ -f "$WORDPRESS_DB_PASSWORD" ]; then
+    WORDPRESS_DB_PASSWORD="$(cat $WORDPRESS_DB_PASSWORD)"
+  fi
 	if [ -z "$WORDPRESS_DB_PASSWORD" ]; then
 		echo >&2 'error: missing required WORDPRESS_DB_PASSWORD environment variable'
 		echo >&2 '  Did you forget to -e WORDPRESS_DB_PASSWORD=... ?'
