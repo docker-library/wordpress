@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eu
 
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
@@ -9,14 +9,14 @@ file_env() {
 	local var="$1"
 	local fileVar="${var}_FILE"
 	local def="${2:-}"
-	if [ "${!var}" ] && [ "${!fileVar}" ]; then
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
 		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
 		exit 1
 	fi
 	local val="$def"
-	if [ "${!var}" ]; then
+	if [ "${!var:-}" ]; then
 		val="${!var}"
-	elif [ "${!fileVar}" ]; then
+	elif [ "${!fileVar:-}" ]; then
 		val="$(< "${!fileVar}")"
 	fi
 	export "$var"="$val"
@@ -28,9 +28,9 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	# if we're linked to MySQL and thus have credentials already, let's use them
 	file_env 'WORDPRESS_DB_USER' "${MYSQL_ENV_MYSQL_USER:-root}"
 	if [ "$WORDPRESS_DB_USER" = 'root' ]; then
-		file_env 'WORDPRESS_DB_PASSWORD' "$MYSQL_ENV_MYSQL_ROOT_PASSWORD"
+		file_env 'WORDPRESS_DB_PASSWORD' "${MYSQL_ENV_MYSQL_ROOT_PASSWORD:-}"
 	else
-		file_env 'WORDPRESS_DB_PASSWORD' "$MYSQL_ENV_MYSQL_PASSWORD"
+		file_env 'WORDPRESS_DB_PASSWORD' "${MYSQL_ENV_MYSQL_PASSWORD:-}"
 	fi
 	file_env 'WORDPRESS_DB_NAME' "${MYSQL_ENV_MYSQL_DATABASE:-wordpress}"
 	if [ -z "$WORDPRESS_DB_PASSWORD" ]; then
