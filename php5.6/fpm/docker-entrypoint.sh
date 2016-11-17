@@ -1,16 +1,38 @@
 #!/bin/bash
-set -e
+set -eu
+
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+	local var="$1"
+	local fileVar="${var}_FILE"
+	local def="${2:-}"
+	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		exit 1
+	fi
+	local val="$def"
+	if [ "${!var:-}" ]; then
+		val="${!var}"
+	elif [ "${!fileVar:-}" ]; then
+		val="$(< "${!fileVar}")"
+	fi
+	export "$var"="$val"
+	unset "$fileVar"
+}
 
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
-	: "${WORDPRESS_DB_HOST:=mysql}"
+	file_env 'WORDPRESS_DB_HOST' 'mysql'
 	# if we're linked to MySQL and thus have credentials already, let's use them
-	: ${WORDPRESS_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}
+	file_env 'WORDPRESS_DB_USER' "${MYSQL_ENV_MYSQL_USER:-root}"
 	if [ "$WORDPRESS_DB_USER" = 'root' ]; then
-		: ${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}
+		file_env 'WORDPRESS_DB_PASSWORD' "${MYSQL_ENV_MYSQL_ROOT_PASSWORD:-}"
+	else
+		file_env 'WORDPRESS_DB_PASSWORD' "${MYSQL_ENV_MYSQL_PASSWORD:-}"
 	fi
-	: ${WORDPRESS_DB_PASSWORD:=$MYSQL_ENV_MYSQL_PASSWORD}
-	: ${WORDPRESS_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-wordpress}}
-
+	file_env 'WORDPRESS_DB_NAME' "${MYSQL_ENV_MYSQL_DATABASE:-wordpress}"
 	if [ -z "$WORDPRESS_DB_PASSWORD" ]; then
 		echo >&2 'error: missing required WORDPRESS_DB_PASSWORD environment variable'
 		echo >&2 '  Did you forget to -e WORDPRESS_DB_PASSWORD=... ?'
@@ -105,9 +127,10 @@ EOPHP
 		NONCE_SALT
 	)
 	for unique in "${UNIQUES[@]}"; do
-		eval unique_value=\$WORDPRESS_$unique
-		if [ "$unique_value" ]; then
-			set_config "$unique" "$unique_value"
+		uniqVar="WORDPRESS_$unique"
+		file_env "$uniqVar"
+		if [ "${!uniqVar}" ]; then
+			set_config "$unique" "${!uniqVar}"
 		else
 			# if not specified, let's generate a random value
 			current_set="$(sed -rn -e "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
@@ -117,10 +140,12 @@ EOPHP
 		fi
 	done
 
+	file_env 'WORDPRESS_TABLE_PREFIX'
 	if [ "$WORDPRESS_TABLE_PREFIX" ]; then
 		set_config '$table_prefix' "$WORDPRESS_TABLE_PREFIX"
 	fi
 
+	file_env 'WORDPRESS_DEBUG'
 	if [ "$WORDPRESS_DEBUG" ]; then
 		set_config 'WP_DEBUG' 1 boolean
 	fi
