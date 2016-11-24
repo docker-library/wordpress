@@ -1,6 +1,4 @@
-FROM php:5.6-apache
-
-RUN a2enmod rewrite
+FROM php:7.0-apache
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
@@ -18,27 +16,22 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+RUN a2enmod rewrite expires
+
+VOLUME /var/www/html
+
 RUN curl -sS https://getcomposer.org/installer | php \
         && mv composer.phar /usr/local/bin/composer
 
-ADD config/*.php /tmp/config/
+RUN mkdir /usr/src/october && cd /usr/src/october && curl -s https://octobercms.com/api/installer | php
 
-ADD docker-entrypoint.sh /entrypoint.sh
+COPY config/*.php /usr/src/october/config/
 
-RUN chmod +x /entrypoint.sh
+RUN chown -R www-data:www-data /usr/src/october
 
-ONBUILD ADD . /usr/src/october
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
-ONBUILD RUN cd /usr/src/october \
-      && composer install --no-interaction --prefer-dist \
-      && cp /tmp/config/*.php config/
-
-ONBUILD RUN chown -R www-data:www-data /usr/src/october
-
-ONBUILD VOLUME /var/www/html
-
-ONBUILD WORKDIR /var/www/html
-
-ONBUILD ENTRYPOINT ["/entrypoint.sh"]
-
-ONBUILD CMD ["apache2-foreground"]
+# ENTRYPOINT resets CMD
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]

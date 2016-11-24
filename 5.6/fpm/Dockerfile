@@ -1,6 +1,4 @@
-FROM php:5.6-apache
-
-RUN a2enmod rewrite
+FROM php:5.6-fpm
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
@@ -29,8 +27,9 @@ COPY config/*.php /usr/src/october/config/
 
 RUN chown -R www-data:www-data /usr/src/october
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
-ENTRYPOINT ["/entrypoint.sh"]
-
-CMD ["apache2-foreground"]
+# ENTRYPOINT resets CMD
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]

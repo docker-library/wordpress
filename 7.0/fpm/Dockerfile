@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:7.0-fpm
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng12-dev libjpeg-dev && rm -rf /var/lib/apt/lists/* \
@@ -16,20 +16,20 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-
 VOLUME /var/www/html
 
 RUN curl -sS https://getcomposer.org/installer | php \
         && mv composer.phar /usr/local/bin/composer
-        
+
 RUN mkdir /usr/src/october && cd /usr/src/october && curl -s https://octobercms.com/api/installer | php
 
 COPY config/*.php /usr/src/october/config/
 
 RUN chown -R www-data:www-data /usr/src/october
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
-ENTRYPOINT ["/entrypoint.sh"]
-
-CMD ["apache2-foreground"]
+# ENTRYPOINT resets CMD
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]

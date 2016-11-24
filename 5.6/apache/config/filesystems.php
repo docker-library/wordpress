@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'cloud' => getenv('OCTOBER_FILESYSTEMS_DEFAULT') ?: 's3',
+    'cloud' => getenv('OCTOBER_FILESYSTEMS_CLOUD') ?: 's3',
 
     /*
     |--------------------------------------------------------------------------

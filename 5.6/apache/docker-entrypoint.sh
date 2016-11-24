@@ -71,12 +71,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         if ! [ -d vendor ]; then
           composer install
         fi
-
+        
         # Generate random key for this container if it's not specified
         if [ -n "$OCTOBER_KEY" ]; then
           export OCTOBER_KEY = "$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         fi
-
 
 TERM=dumb php -- "$OCTOBER_DB_HOST" "$OCTOBER_DB_PORT" "$OCTOBER_DB_USER" "$OCTOBER_DB_PASSWORD" "$OCTOBER_DB_NAME" <<'EOPHP'
 <?php
@@ -141,7 +140,6 @@ IFS=';' read -ra THEME <<< "$OCTOBER_THEMES"
 for i in "${THEME[@]}"; do
     php artisan theme:install $i
 done
-
 
 chown -R www-data:www-data /var/www/html
 
