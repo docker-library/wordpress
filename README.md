@@ -1,6 +1,12 @@
+# Supported tags and respective `Dockerfile` links
+- `php5.6-apache`, ([php5.6/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/5.6/apache/Dockerfile))
+- `php5.6-fpm` ([php5.6/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/5.6/fpm/Dockerfile))
+- `latest`, `php7.0-apache` ([php7.0/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.0/apache/Dockerfile))
+- `php7.0-fpm` ([php7.0/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.0/fpm/Dockerfile))
+
 # About this Repo
 
-This automated build is based on the official Wordpress automated build image, and supports the same tags.
+This automated build is based on the official Wordpress automated build image, and supports similar tags.
 
 ## Quickstart
 If you'd like to get up and running quickly, this image can be run without any linked containers.
