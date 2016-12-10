@@ -15,10 +15,17 @@ sha1="$(curl -fsSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
 declare -A variantExtras=(
 	[apache]='\nRUN a2enmod rewrite expires\n'
 	[fpm]=''
+	[fpm-alpine]=''
 )
 declare -A variantCmds=(
 	[apache]='apache2-foreground'
 	[fpm]='php-fpm'
+	[fpm-alpine]='php-fpm'
+)
+declare -A variantBases=(
+	[apache]='debian'
+	[fpm]='debian'
+	[fpm-alpine]='alpine'
 )
 
 travisEnv=
@@ -26,12 +33,13 @@ for phpVersion in "${phpVersions[@]}"; do
 	phpVersionDir="$phpVersion"
 	phpVersion="${phpVersion#php}"
 
-	for variant in apache fpm; do
+	for variant in apache fpm fpm-alpine; do
 		dir="$phpVersionDir/$variant"
 		mkdir -p "$dir"
 
 		extras="${variantExtras[$variant]}"
 		cmd="${variantCmds[$variant]}"
+		base="${variantBases[$variant]}"
 
 		(
 			set -x
@@ -43,7 +51,7 @@ for phpVersion in "${phpVersions[@]}"; do
 				-e 's!%%VARIANT%%!'"$variant"'!g' \
 				-e 's!%%VARIANT_EXTRAS%%!'"$extras"'!g' \
 				-e 's!%%CMD%%!'"$cmd"'!g' \
-				Dockerfile.template > "$dir/Dockerfile"
+				"Dockerfile-${base}.template" > "$dir/Dockerfile"
 
 			cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
 		)

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
@@ -135,7 +135,7 @@ EOPHP
 			# if not specified, let's generate a random value
 			current_set="$(sed -rn -e "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
 			if [ "$current_set" = 'put your unique phrase here' ]; then
-				set_config "$unique" "$(head -c1M /dev/urandom | sha1sum | cut -d' ' -f1)"
+				set_config "$unique" "$(head -c1m /dev/urandom | sha1sum | cut -d' ' -f1)"
 			fi
 		fi
 	done
