@@ -48,7 +48,7 @@ join() {
 }
 
 for phpVersion in "${phpVersions[@]}"; do
-	for variant in apache fpm; do
+	for variant in apache fpm fpm-alpine; do
 		dir="$phpVersion/$variant"
 		[ -f "$dir/Dockerfile" ] || continue
 

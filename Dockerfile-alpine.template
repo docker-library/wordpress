@@ -1,18 +1,33 @@
-FROM php:5.6-apache
+FROM php:%%PHP_VERSION%%-%%VARIANT%%
+
+# docker-entrypoint.sh dependencies
+RUN apk add --no-cache \
+# in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
+		bash \
+# BusyBox sed is not sufficient for some of our sed expressions
+		sed
 
 # install the PHP extensions we need
 RUN set -ex; \
 	\
-	apt-get update; \
-	apt-get install -y \
-		libjpeg-dev \
-		libpng12-dev \
+	apk add --no-cache --virtual .build-deps \
+		libjpeg-turbo-dev \
+		libpng-dev \
 	; \
-	rm -rf /var/lib/apt/lists/*; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache
-# TODO consider removing the *-dev deps and only keeping the necessary lib* packages
+	docker-php-ext-install gd mysqli opcache; \
+	\
+	runDeps="$( \
+		scanelf --needed --nobanner --recursive \
+			/usr/local/lib/php/extensions \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)"; \
+	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
+	apk del .build-deps
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -24,13 +39,11 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-RUN a2enmod rewrite expires
-
+%%VARIANT_EXTRAS%%
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 4.7
-ENV WORDPRESS_SHA1 1e14144c4db71421dc4ed22f94c3914dfc3b7020
+ENV WORDPRESS_VERSION %%WORDPRESS_VERSION%%
+ENV WORDPRESS_SHA1 %%WORDPRESS_SHA1%%
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
@@ -43,4 +56,4 @@ RUN set -ex; \
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+CMD ["%%CMD%%"]
