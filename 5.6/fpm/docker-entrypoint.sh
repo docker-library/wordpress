@@ -141,6 +141,8 @@ for i in "${THEME[@]}"; do
     php artisan theme:install $i
 done
 
+php artisan october:update
+
 chown -R www-data:www-data /var/www/html
 
 fi

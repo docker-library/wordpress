@@ -40,7 +40,7 @@ for phpVersion in "${phpVersions[@]}"; do
 				-e 's!%%CMD%%!'"$cmd"'!g' \
 				Dockerfile.template > "$dir/Dockerfile"
 
-			cp docker-entrypoint.sh "$dir/docker-entrypoint.sh"
+			cp -rf docker-entrypoint.sh "$dir/docker-entrypoint.sh"
 			cp -R config "$dir/"
 		)
 
