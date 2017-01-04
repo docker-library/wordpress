@@ -31,6 +31,7 @@ RUN { \
 		echo 'max_execution_time=600'; \
 	} > /usr/local/etc/php/conf.d/filelimits.ini
 
+
 RUN a2enmod rewrite expires
 
 VOLUME /var/www/html
