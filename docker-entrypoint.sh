@@ -150,7 +150,10 @@ EOPHP
 		set_config 'WP_DEBUG' 1 boolean
 	fi
 
-	TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
+	if [ "$WORDPRESS_SKIP_CREATE_DB_IF_NOT_EXISTS" == "true" ] ; then
+		echo "Skipping call to sql call, CREATE DATABASE IF NOT EXISTS"
+	else
+	    TERM=dumb php -- "$WORDPRESS_DB_HOST" "$WORDPRESS_DB_USER" "$WORDPRESS_DB_PASSWORD" "$WORDPRESS_DB_NAME" <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 
@@ -188,6 +191,7 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 
 $mysql->close();
 EOPHP
+	fi
 fi
 
 exec "$@"
