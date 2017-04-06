@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'debug' => getenv('OCTOBER_APP_DEBUG') ?: true,
+    'debug' => env('OCTOBER_APP_DEBUG', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'url' => getenv('OCTOBER_APP_URL') ?: 'http://localhost',
+    'url' => env('OCTOBER_APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'timezone' => getenv('OCTOBER_APP_TIMEZONE') ?: 'UTC',
+    'timezone' => env('OCTOBER_APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'locale' => getenv('OCTOBER_APP_LOCALE') ?: 'en',
+    'locale' => env('OCTOBER_APP_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -81,9 +81,9 @@ return [
     |
     */
 
-    'key' => getenv('OCTOBER_APP_KEY') ?: 'CHANGE_ME!!!!!!!',
+    'key' => env('OCTOBER_APP_KEY', 'CHANGE_ME!!!!!!!'),
 
-    'cipher' => MCRYPT_RIJNDAEL_128,
+    'cipher' => env('OCTOBER_APP_CIPHER', 'AES-256-CBC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -98,7 +98,7 @@ return [
     |
     */
 
-    'log' => getenv('OCTOBER_APP_LOG') ?: 'single',
+    'log' => env('OCTOBER_APP_LOG', 'single'),
 
     /*
     |--------------------------------------------------------------------------

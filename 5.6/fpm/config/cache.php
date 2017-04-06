@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => getenv('OCTOBER_CACHE_DEFAULT') ?: 'file',
+    'default' => env('OCTOBER_CACHE_DEFAULT', 'file'),
 
     /*
     |--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ return [
             'driver'  => 'memcached',
             'servers' => [
                 [
-                    'host' => '127.0.0.1', 'port' => 11211, 'weight' => 100
+                    'host' => 'memcached', 'port' => 11211, 'weight' => 100
                 ],
             ],
         ],

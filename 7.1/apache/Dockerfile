@@ -1,4 +1,4 @@
-FROM php:5.6-apache
+FROM php:7.1-apache
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y vim git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng12-dev libjpeg-dev libz-dev libmemcached-dev libphp-predis && rm -rf /var/lib/apt/lists/* \
