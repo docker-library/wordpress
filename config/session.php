@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'connection' => env('OCTOBER_SESSION_CONNECTION', null),
+    'connection' => env('OCTOBER_SESSION_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------
@@ -135,7 +135,7 @@ return [
     |
     */
 
-    'domain' => env('OCTOBER_SESSION_DOMAIN', null),
+    'domain' => env('OCTOBER_SESSION_DOMAIN'),
 
     /*
     |--------------------------------------------------------------------------
