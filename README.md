@@ -42,17 +42,23 @@ These commands will start up the database, link the containers and configure Oct
 Example `docker-compose.yml` for `dragontek/octobercms`:
 
 ```
-october:
-  image: dragontek/octobercms
-  links:
-    - db:mysql
-  ports:
-    - 8080:80
-
-db:
-  image: mariadb
-  environment:
-    MYSQL_ROOT_PASSWORD: example
+version: '2'
+services:
+  web:
+    image: "dragontek/octobercms"
+    ports:
+     - "8080:80"
+    environment:
+     - GIT_HOSTS=gitlab.com
+     - GIT_THEMES=git@gitlab.com:path/mytheme.git
+     - OCTOBER_PLUGINS=October.Drivers;RainLab.Builder;RainLab.Editable;RainLab.GoogleAnalytics;
+     - OCTOBER_CMS_ACTIVE_THEME=mytheme
+    volumes:
+     - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+  mysql:
+    image: "mariadb"
+    environment:
+     - MYSQL_RANDOM_ROOT_PASSWORD=yes
 ```
 Alternatively, you can specify an external database with environment variables (see below).
 
@@ -64,12 +70,26 @@ The following environment variables are honored for configuring your October ins
 * `-e OCTOBER_DB_PASSWORD=...` (defaults to the password for the user of the linked database container)
 * `-e OCTOBER_DB_NAME=...` (defaults to `october_cms`)
 
-## Themes and Plugins
+## October Themes and Plugins
 Themes and/or plugins can be installed from the marketplace with the following environment variables:
 * `-e OCTOBER_THEMES=...` (defaults to null)
 * `-e OCTOBER_PLUGINS=...` (defaults to null)
 
 Use semicolon separated list for multiple themes or plugins (e.g. `-e OCTOBER_PLUGINS="RainLab.Blog;RainLab.GoogleAnalytics"`)
+
+## Git Themes and Plugins
+Themes and/or plugins can be installed from the git repositories with the following environment variables:
+* `-e GIT_HOSTS=...` (defaults to null, used to add git servers to /root/.ssh/known_hosts, only needed for ssh)
+* `-e GIT_THEMES=...` (defaults to null)
+* `-e GIT_PLUGINS=...` (defaults to null)
+
+Use semicolon separated list for multiple themes or plugins (e.g. `-e GIT_THEMES="git@gitlab.com:path/repo.git"`)
+
+If you use a private repository, then you should map your private key to the container (e.g `-v ~/.ssh/id_rsa:/root/.ssh/id_rsa`)
+
+Another solution is to get an "Personal Access Token" from your repository provider and use https instead (e.g. `-e GIT_THEMES="https://username:token@gitlab.com:path/repo.git"`)
+
+Please note that for Plugins, you should include the namespace path in the repository, as the image will clone directly into the `plugins` directory.
 
 ## Other Environment Variables
 Most of the configuration settings can be set through environment variables.  The format always starts with `OCTOBER_` and then the configuration file name (e.g. `APP_`), and then the property name (e.g. `DEBUG`).  Property names that are camel case are split by the underscore, as are any sub properties.  Please refer to the configuration files for more detailed explanations and for valid settings.
@@ -80,6 +100,7 @@ Most of the configuration settings can be set through environment variables.  Th
 * `-e OCTOBER_APP_TIMEZONE=...` (defaults to `'UTC'`)
 * `-e OCTOBER_APP_LOCALE=...` (defaults to `'en'`)
 * `-e OCTOBER_APP_KEY=...` (defaults to randomly generated 32 bit key)
+* `-e OCTOBER_APP_CIPHER=...` (defaults to `'AES-256-CBC'`)
 * `-e OCTOBER_APP_LOG=...` (defaults to `'single'`)
 
 ### CMS settings
@@ -134,6 +155,16 @@ Most of the configuration settings can be set through environment variables.  Th
 * `-e OCTOBER_SERVICES_STRIPE_MODEL=...` (defaults to `'User'`)
 * `-e OCTOBER_SERVICES_STRIPE_SECRET=...` (defaults to `''`)
 
+### SESSION settings
+* `-e OCTOBER_SESSION_DRIVER=...` (defaults to `'file'`)
+* `-e OCTOBER_SESSION_LIFETIME=...` (defaults to `120`)
+* `-e OCTOBER_SESSION_ENCRYPT=...` (defaults to `false`)
+* `-e OCTOBER_SESSION_CONNECTION=...` (defaults to `null`)
+* `-e OCTOBER_SESSION_TABLE=...` (defaults to `'sessions'`)
+* `-e OCTOBER_SESSION_COOKIE=...` (defaults to `'october_session'`)
+* `-e OCTOBER_SESSION_PATH=...` (defaults to `'/'`)
+* `-e OCTOBER_SESSION_DOMAIN=...` (defaults to `null`)
+* `-e OCTOBER_SESSION_SECURE=...` (defaults to `false`)
 
 ## Notes
 Work on this image is ongoing, and I intend to support more environment variables to allow the user to configure more of their October instance.
