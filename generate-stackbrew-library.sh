@@ -134,8 +134,9 @@ for phpVersion in "${phpVersions[@]}"; do
 	variantAliases=( "${versionAliases[@]/#/$variant-}" )
 	variantAliases=( "${variantAliases[@]//-latest/}" )
 
-	phpVersionVariantAliases=( "${versionAliases[@]/#/$phpVersion-$variant-}" )
+	phpVersionVariantAliases=( "${versionAliases[@]/#/$variant-}" )
 	phpVersionVariantAliases=( "${phpVersionVariantAliases[@]//-latest/}" )
+	phpVersionVariantAliases=( "${phpVersionVariantAliases[@]/%/-$phpVersion}" )
 
 	fullAliases=()
 
