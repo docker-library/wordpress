@@ -3,6 +3,66 @@ set -e
 
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
+        # Copy files to the web directory if they don't exist already
+        if ! [ -e index.php ]; then
+                echo >&2 "OctoberCMS not found in $(pwd) - copying now..."
+                if [ "$(ls -A)" ]; then
+                        echo >&2 "WARNING: $(pwd) is not empty - press Ctrl+C now if this is an error!"
+                        ( set -x; ls -A; sleep 10 )
+                fi
+                tar cf - --one-file-system -C /usr/src/october . | tar xf -
+                echo >&2 "Complete! OctoberCMS has been successfully copied to $(pwd)"
+        fi
+
+        # if we have a clean repo then install
+        if ! [ -d vendor ]; then
+          composer install
+        fi
+
+        # Generate random key for laravel if it's not specified
+        php artisan key:generate
+
+        # Make sure we have the right permissions
+        if [ -f /root/.ssh/id_rsa ]; then
+          chmod 0600 /root/.ssh/id_rsa
+        fi
+
+        # Add git host keys to known hosts
+        IFS=';' read -ra KEY <<< "$GIT_HOSTS"
+        for i in "${KEY[@]}"; do
+            ssh-keyscan -H $i >> /root/.ssh/known_hosts
+        done
+
+        # Install git themes if they are identified
+        IFS=';' read -ra THEME <<< "$GIT_THEMES"
+        for i in "${THEME[@]}"; do
+          basename=$(basename $i)
+          repo=${basename%.*}
+          # Only clone if it doesn't already exist
+          if ! [ -e themes/$repo ]; then
+            (cd themes && git clone $i)
+          fi
+        done
+
+        # Install git plugins if they are identified
+        IFS=';' read -ra PLUGIN <<< "$GIT_PLUGINS"
+        for i in "${PLUGIN[@]}"; do
+          url_without_suffix="${i%.*}"
+          reponame="$(basename "${url_without_suffix}")"
+          hostname="$(basename "${url_without_suffix%/${reponame}}")"
+          namespace="${hostname##*:}"
+          # Only clone if it doesn't already exist
+          if ! [ -e plugins/$namespace/$reponame ]; then
+            (cd plugins && git clone $i $namespace/$reponame)
+          fi
+        done
+
+        # If we don't need a database we can bail here
+        if [ "$OCTOBER_DB_DRIVER" == 'none' ] ; then
+          echo >&2 'Notice! Database has been disabled.'
+          exec "$@"
+        fi
+
         # WARNING: Linked environment variables are depreciated and only work in docker-compose v1
         if [ -n "$MYSQL_PORT_3306_TCP" ]; then
                 if [ -z "$OCTOBER_DB_HOST" ]; then
@@ -55,25 +115,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
           exit 1
         fi
 
-        if ! [ -e index.php ]; then
-                echo >&2 "OctoberCMS not found in $(pwd) - copying now..."
-                if [ "$(ls -A)" ]; then
-                        echo >&2 "WARNING: $(pwd) is not empty - press Ctrl+C now if this is an error!"
-                        ( set -x; ls -A; sleep 10 )
-                fi
-                tar cf - --one-file-system -C /usr/src/october . | tar xf -
-                echo >&2 "Complete! OctoberCMS has been successfully copied to $(pwd)"
-        fi
-
-        # Install Drivers Plugin from git since none of the artisan commands work
-        # if you need these drivers (like redis) ahead of time (e.g. plugin:install, october:up)
-        #git clone https://github.com/octoberrain/drivers-plugin.git plugins/october/driver
-        #composer require predis/predis
-
-        # if we have a clean repo then install
-        if ! [ -d vendor ]; then
-          composer install
-        fi
         
 TERM=dumb php -- "$OCTOBER_DB_DRIVER" "$OCTOBER_DB_HOST" "$OCTOBER_DB_PORT" "$OCTOBER_DB_PASSWORD" "$OCTOBER_DB_NAME" <<'EOPHP'
 <?php
@@ -125,9 +166,6 @@ EOPHP
 # Export the variables so we can use them in config files
 export OCTOBER_DB_DRIVER OCTOBER_DB_HOST OCTOBER_DB_PORT OCTOBER_DB_PASSWORD OCTOBER_DB_NAME
 
-# Generate random key for laravel if it's not specified
-php artisan key:generate
-
 # Bring up the initial OctoberCMS database
 php artisan october:up
 
@@ -141,34 +179,6 @@ done
 IFS=';' read -ra THEME <<< "$OCTOBER_THEMES"
 for i in "${THEME[@]}"; do
     php artisan theme:install $i
-done
-
-# Add git host keys to known hosts
-IFS=';' read -ra KEY <<< "$GIT_HOSTS"
-for i in "${KEY[@]}"; do
-    ssh-keyscan -H $i >> /root/.ssh/known_hosts
-done
-
-# Install git plugins if they are identified
-IFS=';' read -ra PLUGIN <<< "$GIT_PLUGINS"
-for i in "${PLUGIN[@]}"; do
-  basename=$(basename $i)
-  repo=${basename%.*}
-  # Only clone if it doesn't already exist
-  if ! [ -e plugins/$repo ]; then
-    (cd plugins && git clone $i)
-  fi
-done
-
-# Install git themes if they are identified
-IFS=';' read -ra THEME <<< "$GIT_THEMES"
-for i in "${THEME[@]}"; do
-  basename=$(basename $i)
-  repo=${basename%.*}
-  # Only clone if it doesn't already exist
-  if ! [ -e themes/$repo ]; then
-    (cd themes && git clone $i)
-  fi
 done
 
 # Pull latest code from all plugin and theme git repos

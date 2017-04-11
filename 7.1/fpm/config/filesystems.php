@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => getenv('OCTOBER_FILESYSTEMS_DEFAULT') ?: 'local',
+    'default' => env('OCTOBER_FILESYSTEMS_DEFAULT', 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'cloud' => getenv('OCTOBER_FILESYSTEMS_CLOUD') ?: 's3',
+    'cloud' => env('OCTOBER_FILESYSTEMS_CLOUD', 's3'),
 
     /*
     |--------------------------------------------------------------------------
@@ -50,18 +50,19 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'key'    => getenv('OCTOBER_FILESYSTEMS_DISKS_S3_KEY') ?: 'your-key',
-            'secret' => getenv('OCTOBER_FILESYSTEMS_DISKS_S3_SECRET') ?: 'your-secret',
-            'region' => getenv('OCTOBER_FILESYSTEMS_DISKS_S3_REGION') ?: 'your-region',
-            'bucket' => getenv('OCTOBER_FILESYSTEMS_DISKS_S3_BUCKET') ?: 'your-bucket',
+            'key'    => env('OCTOBER_FILESYSTEMS_DISKS_S3_KEY', 'your-key'),
+            'secret' => env('OCTOBER_FILESYSTEMS_DISKS_S3_SECRET', 'your-secret'),
+            'region' => env('OCTOBER_FILESYSTEMS_DISKS_S3_REGION', 'your-region'),
+            'bucket' => env('OCTOBER_FILESYSTEMS_DISKS_S3_BUCKET', 'your-bucket'),
+            'endpoint' => env('OCTOBER_FILESYSTEMS_DISKS_S3_ENDPOINT')
         ],
 
         'rackspace' => [
             'driver'    => 'rackspace',
-            'username'  => getenv('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_USERNAME') ?: 'your-username',
-            'key'       => getenv('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_KEY') ?: 'your-key',
-            'container' => getenv('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_CONTAINER') ?: 'your-container',
-            'endpoint'  => 'https://identity.api.rackspacecloud.com/v2.0/',
+            'username'  => env('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_USERNAME', 'your-username'),
+            'key'       => env('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_KEY', 'your-key'),
+            'container' => env('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_CONTAINER', 'your-container'),
+            'endpoint'  => env('OCTOBER_FILESYSTEMS_DISKS_RACKSPACE_ENDPOINT', 'https://identity.api.rackspacecloud.com/v2.0/'),
             'region'    => 'IAD',
         ],
 
