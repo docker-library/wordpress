@@ -1,8 +1,10 @@
 # Supported tags and respective `Dockerfile` links
 - `php5.6-apache`, ([php5.6/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/5.6/apache/Dockerfile))
 - `php5.6-fpm` ([php5.6/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/5.6/fpm/Dockerfile))
-- `latest`, `php7.0-apache` ([php7.0/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.0/apache/Dockerfile))
+- `php7.0-apache` ([php7.0/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.0/apache/Dockerfile))
 - `php7.0-fpm` ([php7.0/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.0/fpm/Dockerfile))
+- `latest`, `php7.1-apache` ([php7.1/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.1/apache/Dockerfile))
+- `php7.1-fpm` ([php7.1/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.1/fpm/Dockerfile))
 
 # About this Repo
 
@@ -39,8 +41,7 @@ $ docker run --name some-october --link some-postgres:postgres -d dragontek/octo
 These commands will start up the database, link the containers and configure October to use the appropriate database.
 
 ## ... via `docker-compose`
-Example `docker-compose.yml` for `dragontek/octobercms`:
-
+Basic Example `docker-compose.yml` for `dragontek/octobercms`:
 ```
 version: '2'
 services:
@@ -48,25 +49,53 @@ services:
     image: "dragontek/octobercms"
     ports:
      - "8080:80"
-    environment:
-     - GIT_HOSTS=gitlab.com
-     - GIT_THEMES=git@gitlab.com:path/mytheme.git
-     - OCTOBER_PLUGINS=October.Drivers;RainLab.Builder;RainLab.Editable;RainLab.GoogleAnalytics;
-     - OCTOBER_CMS_ACTIVE_THEME=mytheme
-    volumes:
-     - ~/.ssh/id_rsa:/root/.ssh/id_rsa
   mysql:
     image: "mariadb"
     environment:
-     - MYSQL_RANDOM_ROOT_PASSWORD=yes
+     - MYSQL_ROOT_PASSWORD=example
+  memcached:
+    image: "memcached"
 ```
-Alternatively, you can specify an external database with environment variables (see below).
+
+
+Advanced Example `docker-compose.yml` for `dragontek/octobercms`:
+```
+version: '2'
+services:
+  web:
+    image: "dragontek/octobercms"
+    ports:
+     - "8080:80"
+    depends_on:
+     - postgres
+     - memcached
+     - redis
+    environment:
+     - GIT_HOSTS=gitlab.com
+     - GIT_THEMES=git@gitlab.com:path/mytheme.git
+     - OCTOBER_CMS_ACTIVE_THEME=mytheme
+     - OCTOBER_PLUGINS=October.Drivers;RainLab.GoogleAnalytics;
+     - OCTOBER_DB_DRIVER=pgsql
+     - OCTOBER_DB_HOST=postgres
+     - OCTOBER_DB_PASSWORD=example
+     - OCTOBER_CACHE_DEFAULT=memcached
+     - OCTOBER_SESSION_DRIVER=redis
+    volumes:
+     - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+  postgres:
+    image: "postgres"
+    environment:
+     - POSTGRES_PASSWORD=example
+  memcached:
+    image: "memcached"
+  redis:
+    image: "redis"
+```
 
 ## Database Environment Variables
 The following environment variables are honored for configuring your October instance:
-* `-e OCTOBER_DB_DRIVER=...` (defaults to appropriate driver for linked database container, must be specified as either 'mysql' or 'pgsql' for external database)
+* `-e OCTOBER_DB_DRIVER=...` (defaults to appropriate driver for linked database container. Must be specified as either 'mysql' or 'pgsql' for external database.  May be set to 'none' for no database)
 * `-e OCTOBER_DB_HOST=...` (defaults to the IP of the linked database container)
-* `-e OCTOBER_DB_USER=...` (defaults to the database user (`root` or `postgres`) of the linked database container)
 * `-e OCTOBER_DB_PASSWORD=...` (defaults to the password for the user of the linked database container)
 * `-e OCTOBER_DB_NAME=...` (defaults to `october_cms`)
 
@@ -89,7 +118,7 @@ If you use a private repository, then you should map your private key to the con
 
 Another solution is to get an "Personal Access Token" from your repository provider and use https instead (e.g. `-e GIT_THEMES="https://username:token@gitlab.com:path/repo.git"`)
 
-Please note that for Plugins, you should include the namespace path in the repository, as the image will clone directly into the `plugins` directory.
+Please note that for Plugins, it will determine namespace based on your repository path (e.g `git@gitlab.com:mycompany/blog.git` will clone into `/plugins/mycompany/blog`)
 
 ## Other Environment Variables
 Most of the configuration settings can be set through environment variables.  The format always starts with `OCTOBER_` and then the configuration file name (e.g. `APP_`), and then the property name (e.g. `DEBUG`).  Property names that are camel case are split by the underscore, as are any sub properties.  Please refer to the configuration files for more detailed explanations and for valid settings.
