@@ -23,18 +23,21 @@ declare -A variantExtras=(
 	[apache]='\nRUN a2enmod rewrite expires\n'
 	[fpm]=''
 	[fpm-alpine]=''
+	[nginx]=''
 	[cli]='' # unused
 )
 declare -A variantCmds=(
 	[apache]='apache2-foreground'
 	[fpm]='php-fpm'
 	[fpm-alpine]='php-fpm'
+	[nginx]='supervisord'
 	[cli]='' # unused
 )
 declare -A variantBases=(
 	[apache]='debian'
 	[fpm]='debian'
 	[fpm-alpine]='alpine'
+	[nginx]='nginx'
 	[cli]='cli'
 )
 
@@ -43,7 +46,7 @@ for phpVersion in "${phpVersions[@]}"; do
 	phpVersionDir="$phpVersion"
 	phpVersion="${phpVersion#php}"
 
-	for variant in apache fpm fpm-alpine cli; do
+	for variant in apache fpm fpm-alpine nginx cli; do
 		dir="$phpVersionDir/$variant"
 		mkdir -p "$dir"
 
