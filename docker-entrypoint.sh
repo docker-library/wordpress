@@ -31,6 +31,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			( set -x; ls -A; sleep 10 )
 		fi
 		tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
+		chown -R ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} $PWD
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
 			# NOTE: The "Indexes" option is disabled in the php:apache base image
@@ -46,7 +47,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 				</IfModule>
 				# END WordPress
 			EOF
-			chown www-data:www-data .htaccess
+			chown ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} .htaccess
 		fi
 	fi
 
@@ -115,7 +116,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 }
 
 EOPHP
-			chown www-data:www-data wp-config.php
+			chown ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} wp-config.php
 		fi
 
 		# see http://stackoverflow.com/a/2705678/433558
