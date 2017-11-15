@@ -24,14 +24,22 @@ file_env() {
 }
 
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
+	: "${APACHE_RUN_USER:-www-data}"
+	: "${APACHE_RUN_GROUP:-www-data}"
+	export APACHE_RUN_USER APACHE_RUN_GROUP
+
 	if ! [ -e index.php -a -e wp-includes/version.php ]; then
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
 			( set -x; ls -A; sleep 10 )
 		fi
-		tar cf - --one-file-system -C /usr/src/wordpress . | tar xf -
-		chown -R ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} $PWD
+		tar --create \
+			--file - \
+			--one-file-system \
+			--directory /usr/src/wordpress \
+			--owner "${APACHE_RUN_USER}" --group "${APACHE_RUN_GROUP}" \
+			. | tar --extract --file -
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
 			# NOTE: The "Indexes" option is disabled in the php:apache base image
@@ -47,7 +55,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 				</IfModule>
 				# END WordPress
 			EOF
-			chown ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} .htaccess
+			chown ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} .htaccess
 		fi
 	fi
 
@@ -116,7 +124,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 }
 
 EOPHP
-			chown ${APACHE_RUN_USER:-www-data}:${APACHE_RUN_GROUP:-www-data} wp-config.php
+			chown ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} wp-config.php
 		fi
 
 		# see http://stackoverflow.com/a/2705678/433558
