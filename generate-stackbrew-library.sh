@@ -1,7 +1,8 @@
 #!/bin/bash
 set -eu
 
-defaultPhpVersion='php5.6'
+# https://wordpress.org/about/requirements/
+defaultPhpVersion='php7.2'
 defaultVariant='apache'
 
 self="$(basename "$BASH_SOURCE")"
