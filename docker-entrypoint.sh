@@ -24,9 +24,21 @@ file_env() {
 }
 
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
-	: "${APACHE_RUN_USER:-www-data}"
-	: "${APACHE_RUN_GROUP:-www-data}"
-	export APACHE_RUN_USER APACHE_RUN_GROUP
+	if [ "$(id -u)" = '0' ]; then
+		case "$1" in
+			apache2*)
+				user="${APACHE_RUN_USER:-www-data}"
+				group="${APACHE_RUN_GROUP:-www-data}"
+				;;
+			*) # php-fpm
+				user='www-data'
+				group='www-data'
+				;;
+		esac
+	else
+		user="$(id -u)"
+		group="$(id -g)"
+	fi
 
 	if ! [ -e index.php -a -e wp-includes/version.php ]; then
 		echo >&2 "WordPress not found in $PWD - copying now..."
@@ -38,7 +50,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			--file - \
 			--one-file-system \
 			--directory /usr/src/wordpress \
-			--owner "${APACHE_RUN_USER}" --group "${APACHE_RUN_GROUP}" \
+			--owner "$user" --group "$group" \
 			. | tar --extract --file -
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
@@ -55,7 +67,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 				</IfModule>
 				# END WordPress
 			EOF
-			chown ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} .htaccess
+			chown "$user:$group" .htaccess
 		fi
 	fi
 
@@ -124,7 +136,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 }
 
 EOPHP
-			chown ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} wp-config.php
+			chown "$user:$group" wp-config.php
 		fi
 
 		# see http://stackoverflow.com/a/2705678/433558
