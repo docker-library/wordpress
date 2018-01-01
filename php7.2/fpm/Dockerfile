@@ -4,15 +4,23 @@ FROM php:7.2-fpm
 RUN set -ex; \
 	\
 	apt-get update; \
-	apt-get install -y \
+	buildDeps=" \
 		libjpeg-dev \
 		libpng-dev \
+	"; \
+	apt-get install -y \
+		$buildDeps \
 	; \
-	rm -rf /var/lib/apt/lists/*; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache
-# TODO consider removing the *-dev deps and only keeping the necessary lib* packages
+	docker-php-ext-install gd mysqli opcache; \
+	\
+	apt-mark manual \
+		libjpeg62-turbo \
+	; \
+	apt-mark manual libpng12-0 || apt-mark manual libpng16-16; \
+	apt-get purge -y --auto-remove $buildDeps; \
+	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
