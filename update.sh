@@ -9,7 +9,7 @@ if [ ${#phpVersions[@]} -eq 0 ]; then
 fi
 phpVersions=( "${phpVersions[@]%/}" )
 
-current="$(curl -fsSL 'http://api.wordpress.org/core/version-check/1.7/' | jq -r '.offers[0].current')"
+current="$(curl -fsSL 'https://api.wordpress.org/core/version-check/1.7/' | jq -r '.offers[0].current')"
 sha1="$(curl -fsSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
 
 cliVersion="$(
