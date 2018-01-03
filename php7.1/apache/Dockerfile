@@ -3,23 +3,29 @@ FROM php:7.1-apache
 # install the PHP extensions we need
 RUN set -ex; \
 	\
+	savedAptMark="$(apt-mark showmanual)"; \
+	\
 	apt-get update; \
-	buildDeps=" \
+	apt-get install -y --no-install-recommends \
 		libjpeg-dev \
 		libpng-dev \
-	"; \
-	apt-get install -y \
-		$buildDeps \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
 	docker-php-ext-install gd mysqli opcache; \
 	\
-	apt-mark manual \
-		libjpeg62-turbo \
-	; \
-	apt-mark manual libpng12-0 || apt-mark manual libpng16-16; \
-	apt-get purge -y --auto-remove $buildDeps; \
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark; \
+	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+		| awk '/=>/ { print $3 }' \
+		| sort -u \
+		| xargs -r dpkg-query -S \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -rt apt-mark manual; \
+	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
