@@ -23,6 +23,12 @@ file_env() {
 	unset "$fileVar"
 }
 
+# usage version "version.php"
+# extracts Wordpress version from version.php file
+version() {
+	sed -n 's/^\$wp_version[^0-9]*\([0-9.]*\).*;$/\1/p' $1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
+}
+
 if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	if [ "$(id -u)" = '0' ]; then
 		case "$1" in
@@ -40,8 +46,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		group="$(id -g)"
 	fi
 
-	if ! [ -e index.php -a -e wp-includes/version.php ]; then
-		echo >&2 "WordPress not found in $PWD - copying now..."
+	if ! [ -e index.php -a -e wp-includes/version.php ] || [ $(version wp-includes/version.php) -lt $(version /usr/src/wordpress/wp-includes/version.php) ]; then
+		if [ -e wp-includes/version.php ]; then
+			echo >&2 "Older version of WordPress found in $PWD - copying now..."
+		else
+			echo >&2 "WordPress not found in $PWD - copying now..."
+		fi
 		if [ "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
 			( set -x; ls -A; sleep 10 )
@@ -70,8 +80,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			chown "$user:$group" .htaccess
 		fi
 	fi
-
-	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
