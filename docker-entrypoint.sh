@@ -46,12 +46,16 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
 			( set -x; ls -A; sleep 10 )
 		fi
+		WP_CONTENT_EXCLUDE=
+		if [ -n $NO_WP_CONTENT ]; then
+			WP_CONTENT_EXCLUDE="--exclude=./wp-content/* --no-overwrite-dir"
+		fi
 		tar --create \
 			--file - \
 			--one-file-system \
 			--directory /usr/src/wordpress \
 			--owner "$user" --group "$group" \
-			. | tar --extract --file -
+			. | tar --extract $WP_CONTENT_EXCLUDE --file -
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
 			# NOTE: The "Indexes" option is disabled in the php:apache base image
@@ -122,6 +126,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		: "${WORDPRESS_DB_PASSWORD:=}"
 		: "${WORDPRESS_DB_NAME:=wordpress}"
 
+		if [ -e wp-config.php ] && [ "${AUTO_CONFIG:-0}" == 1 ]; then
+			exec "$@"
+		fi
+		if [ -e wp-config.php ] && [ ! -w wp-config.php ]; then
+			exec "$@"
+		fi
 		# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 		# https://github.com/docker-library/wordpress/issues/116
 		# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
