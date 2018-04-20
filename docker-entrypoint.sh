@@ -93,6 +93,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		"${uniqueEnvs[@]/#/WORDPRESS_}"
 		WORDPRESS_TABLE_PREFIX
 		WORDPRESS_DEBUG
+		WORDPRESS_SCRIPT_DEBUG
 	)
 	haveConfig=
 	for e in "${envs[@]}"; do
@@ -190,6 +191,10 @@ EOPHP
 
 		if [ "$WORDPRESS_DEBUG" ]; then
 			set_config 'WP_DEBUG' 1 boolean
+		fi
+
+		if [ "$WORDPRESS_SCRIPT_DEBUG" ]; then
+			set_config 'SCRIPT_DEBUG' 1 boolean
 		fi
 
 		TERM=dumb php -- <<'EOPHP'
