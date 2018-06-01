@@ -42,11 +42,12 @@ RUN set -ex; \
 WORKDIR /var/www/html
 VOLUME /var/www/html
 
-# pub   2048R/2F6B6B7F 2016-01-07
-#       Key fingerprint = 3B91 9162 5F3B 1F1B F5DD  3B47 673A 0204 2F6B 6B7F
-# uid                  Daniel Bachhuber <daniel@handbuilt.co>
-# sub   2048R/45F9CDE2 2016-01-07
-ENV WORDPRESS_CLI_GPG_KEY 3B9191625F3B1F1BF5DD3B47673A02042F6B6B7F
+# https://make.wordpress.org/cli/2018/05/31/gpg-signature-change/
+# pub   rsa2048 2018-05-31 [SC]
+#       63AF 7AA1 5067 C056 16FD  DD88 A3A2 E8F2 26F0 BC06
+# uid           [ unknown] WP-CLI Releases <releases@wp-cli.org>
+# sub   rsa2048 2018-05-31 [E]
+ENV WORDPRESS_CLI_GPG_KEY 63AF7AA15067C05616FDDD88A3A2E8F226F0BC06
 
 ENV WORDPRESS_CLI_VERSION %%WORDPRESS_CLI_VERSION%%
 ENV WORDPRESS_CLI_SHA512 %%WORDPRESS_CLI_SHA512%%
