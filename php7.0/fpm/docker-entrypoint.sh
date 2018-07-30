@@ -93,6 +93,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		"${uniqueEnvs[@]/#/WORDPRESS_}"
 		WORDPRESS_TABLE_PREFIX
 		WORDPRESS_DEBUG
+		WORDPRESS_CONFIG_EXTRA
 	)
 	haveConfig=
 	for e in "${envs[@]}"; do
@@ -128,7 +129,17 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		sed -ri -e 's/\r$//' wp-config*
 
 		if [ ! -e wp-config.php ]; then
-			awk '/^\/\*.*stop editing.*\*\/$/ && c == 0 { c = 1; system("cat") } { print }' wp-config-sample.php > wp-config.php <<'EOPHP'
+			awk '
+				/^\/\*.*stop editing.*\*\/$/ && c == 0 {
+					c = 1
+					system("cat")
+					if (ENVIRON["WORDPRESS_CONFIG_EXTRA"]) {
+						print "// WORDPRESS_CONFIG_EXTRA"
+						print ENVIRON["WORDPRESS_CONFIG_EXTRA"] "\n"
+					}
+				}
+				{ print }
+			' wp-config-sample.php > wp-config.php <<'EOPHP'
 // If we're behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
 // see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
