@@ -252,4 +252,8 @@ EOPHP
 	done
 fi
 
+if [ -x /usr/local/bin/before-start-server.sh ]; then
+	/usr/local/bin/before-start-server.sh;
+fi
+
 exec "$@"
