@@ -152,6 +152,13 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 
 EOPHP
 			chown "$user:$group" wp-config.php
+		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
+			# (if the config file already contains the requested PHP code, don't print a warning)
+			echo >&2
+			echo >&2 'WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists'
+			echo >&2 '  The contents of this variable will _not_ be inserted into the existing "wp-config.php" file.'
+			echo >&2 '  (see https://github.com/docker-library/wordpress/issues/333 for more details)'
+			echo >&2
 		fi
 
 		# see http://stackoverflow.com/a/2705678/433558
