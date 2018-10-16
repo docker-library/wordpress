@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM polyverse/ps-php7.2-apache
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -8,6 +8,7 @@ RUN set -ex; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libjpeg-dev \
+		vim \
 		libpng-dev \
 	; \
 	\
@@ -25,7 +26,6 @@ RUN set -ex; \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
 	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
