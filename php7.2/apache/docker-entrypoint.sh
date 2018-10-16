@@ -45,6 +45,18 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		group="$(id -g)"
 	fi
 
+	if [ ! -d /wordpress ]; then
+	    echo "Please mount a directory at /wordpress where unscrambled wordpress can be saved. "
+	    echo "You may mount an empty directory and it will be auto-populated with WordPress."
+	    exit 1
+	fi
+
+	if [ ! -f "$PATH/s_php" ]; then
+        cp /usr/local/bin/php /usr/local/bin/s_php
+    fi
+
+    cd /wordpress
+
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ -n "$(ls -A)" ]; then
@@ -53,6 +65,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		sourceTarArgs=(
 			--create
 			--file -
+			--one-file-system
 			--directory /usr/src/wordpress
 			--owner "$user" --group "$group"
 		)
@@ -64,6 +77,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			# avoid "tar: .: Cannot utime: Operation not permitted" and "tar: .: Cannot change mode to rwxr-xr-x: Operation not permitted"
 			targetTarArgs+=( --no-overwrite-dir )
 		fi
+		scramble.sh
 		tar "${sourceTarArgs[@]}" . | tar "${targetTarArgs[@]}"
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
@@ -83,6 +97,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			chown "$user:$group" .htaccess
 		fi
 	fi
+
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
@@ -276,6 +291,15 @@ EOPHP
 	for e in "${envs[@]}"; do
 		unset "$e"
 	done
+
+    if [ -e /usr/local/bin/scramble.sh ]; then
+        echo "Scrambler script found. Calling it..."
+        /usr/local/bin/scramble.sh
+    fi
+fi
+
+if [ -f "/usr/local/bin/s_php" ]; then
+    rm -rf /usr/local/bin/s_php
 fi
 
 exec "$@"

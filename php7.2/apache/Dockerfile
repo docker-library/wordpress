@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM polyverse/ps-php7.2-apache:6723be0d193a93dfd4f89e6a30e8d450255b4c02
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -8,6 +8,7 @@ RUN set -ex; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libjpeg-dev \
+		vim \
 		libpng-dev \
 	; \
 	\
@@ -25,7 +26,6 @@ RUN set -ex; \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
 	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
@@ -41,6 +41,10 @@ RUN { \
 
 RUN a2enmod rewrite expires
 
+# Keep compiled layer up top so it is reused when scripts are modified.
+WORKDIR $PHP_SRC_PATH
+RUN make install
+
 VOLUME /var/www/html
 
 ENV WORDPRESS_VERSION 5.0
@@ -55,6 +59,7 @@ RUN set -ex; \
 	chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY scramble.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
