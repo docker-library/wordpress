@@ -1,6 +1,7 @@
 language: bash
 services: docker
 
+#environment php
 env:
   - VARIANT=php5.6/apache
   - VARIANT=php5.6/fpm
@@ -19,9 +20,11 @@ env:
   - VARIANT=php7.2/fpm-alpine
   - VARIANT=php7.2/cli
 
+#install library from git
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
+#this script run before run system
 before_script:
   - env | sort
   - wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
@@ -37,6 +40,7 @@ script:
       ~/official-images/test/run.sh "$image"
     )
 
+#this script run after system run
 after_script:
   - docker images
 
