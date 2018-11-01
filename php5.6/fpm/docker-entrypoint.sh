@@ -48,7 +48,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 		tar --create \
 			--file - \
-			--one-file-system \
 			--directory /usr/src/wordpress \
 			--owner "$user" --group "$group" \
 			. | tar --extract --file -
