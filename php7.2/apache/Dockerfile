@@ -56,5 +56,8 @@ RUN set -ex; \
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
+WORKDIR $PHP_SRC_PATH
+RUN make install
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
