@@ -63,7 +63,7 @@ RUN set -ex; \
 	curl -o /usr/local/bin/wp.gpg -fSL "https://github.com/wp-cli/wp-cli/releases/download/v${WORDPRESS_CLI_VERSION}/wp-cli-${WORDPRESS_CLI_VERSION}.phar.gpg"; \
 	\
 	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$WORDPRESS_CLI_GPG_KEY"; \
+	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$WORDPRESS_CLI_GPG_KEY"; \
 	gpg --batch --decrypt --output /usr/local/bin/wp /usr/local/bin/wp.gpg; \
 	command -v gpgconf && gpgconf --kill all || :; \
 	rm -rf "$GNUPGHOME" /usr/local/bin/wp.gpg; \
