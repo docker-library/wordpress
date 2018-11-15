@@ -41,12 +41,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
+		scramble.sh
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
 			( set -x; ls -A; sleep 10 )
 		fi
-		scramble.sh
 		tar --create \
 			--file - \
 			--one-file-system \
@@ -265,5 +265,7 @@ EOPHP
 		unset "$e"
 	done
 fi
+
+rm -rf /usr/local/bin/s_php
 
 exec "$@"
