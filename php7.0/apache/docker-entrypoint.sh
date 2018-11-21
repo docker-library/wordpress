@@ -42,9 +42,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
 		echo >&2 "WordPress not found in $PWD - copying now..."
-		if [ "$(ls -A)" ]; then
-			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
-			( set -x; ls -A; sleep 10 )
+		if [ -n "$(ls -A)" ]; then
+			echo >&2 "WARNING: $PWD is not empty! (copying anyhow)"
 		fi
 		tar --create \
 			--file - \
