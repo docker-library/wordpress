@@ -29,6 +29,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			apache2*)
 				user="${APACHE_RUN_USER:-www-data}"
 				group="${APACHE_RUN_GROUP:-www-data}"
+
+				# strip off any '#' symbol ('#1000' is valid syntax for Apache)
+				pound='#'
+				user="${user#$pound}"
+				group="${group#$pound}"
 				;;
 			*) # php-fpm
 				user='www-data'
@@ -45,11 +50,21 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		if [ -n "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty! (copying anyhow)"
 		fi
-		tar --create \
-			--file - \
-			--directory /usr/src/wordpress \
-			--owner "$user" --group "$group" \
-			. | tar --extract --file -
+		sourceTarArgs=(
+			--create
+			--file -
+			--directory /usr/src/wordpress
+			--owner "$user" --group "$group"
+		)
+		targetTarArgs=(
+			--extract
+			--file -
+		)
+		if [ "$user" != '0' ]; then
+			# avoid "tar: .: Cannot utime: Operation not permitted" and "tar: .: Cannot change mode to rwxr-xr-x: Operation not permitted"
+			targetTarArgs+=( --no-overwrite-dir )
+		fi
+		tar "${sourceTarArgs[@]}" . | tar "${targetTarArgs[@]}"
 		echo >&2 "Complete! WordPress has been successfully copied to $PWD"
 		if [ ! -e .htaccess ]; then
 			# NOTE: The "Indexes" option is disabled in the php:apache base image
