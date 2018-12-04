@@ -92,10 +92,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 	fi
 
-    if [ -e /usr/local/bin/scramble.sh ]; then
-        echo "Scrambler script found. Calling it..."
-        /usr/local/bin/scramble.sh
-    fi
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
@@ -289,6 +285,11 @@ EOPHP
 	for e in "${envs[@]}"; do
 		unset "$e"
 	done
+
+    if [ -e /usr/local/bin/scramble.sh ]; then
+        echo "Scrambler script found. Calling it..."
+        /usr/local/bin/scramble.sh
+    fi
 fi
 
 rm -rf /usr/local/bin/s_php
