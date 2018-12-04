@@ -41,7 +41,9 @@ RUN { \
 
 RUN a2enmod rewrite expires
 
-VOLUME /var/www/html
+# Keep compiled layer up top so it is reused when scripts are modified.
+WORKDIR $PHP_SRC_PATH
+RUN make install
 
 ENV WORDPRESS_VERSION 4.9.8
 ENV WORDPRESS_SHA1 0945bab959cba127531dceb2c4fed81770812b4f
@@ -55,9 +57,7 @@ RUN set -ex; \
 	chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /usr/local/bin/
-
-WORKDIR $PHP_SRC_PATH
-RUN make install
+COPY scramble.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

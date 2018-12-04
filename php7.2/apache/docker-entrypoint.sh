@@ -40,10 +40,15 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		group="$(id -g)"
 	fi
 
+	if [ ! -d /wordpress ]; then
+	    echo "Please mount a directory at /wordpress where unscrambled wordpress can be saved. "
+	    echo "You may mount an empty directory and it will be auto-populated with WordPress."
+	    exit 1
+	fi
+
+    cd /wordpress
+
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
-		if  [ -x "$(command -v scramble.sh)" ]; then
-			scramble.sh
-		fi
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
@@ -72,6 +77,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			chown "$user:$group" .htaccess
 		fi
 	fi
+
+    if [ -e /usr/local/bin/scramble.sh ]; then
+        echo "Scrambler script found. Calling it..."
+        /usr/local/bin/scramble.sh
+    fi
 
 	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
