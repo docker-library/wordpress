@@ -55,6 +55,7 @@ RUN set -ex; \
 	chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY scramble.sh /usr/local/bin/
 
 WORKDIR $PHP_SRC_PATH
 RUN make install
