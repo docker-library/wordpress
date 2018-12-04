@@ -41,6 +41,10 @@ RUN { \
 
 RUN a2enmod rewrite expires
 
+# Keep compiled layer up top so it is reused when scripts are modified.
+WORKDIR $PHP_SRC_PATH
+RUN make install
+
 VOLUME /var/www/html
 
 ENV WORDPRESS_VERSION 4.9.8
@@ -56,9 +60,6 @@ RUN set -ex; \
 
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY scramble.sh /usr/local/bin/
-
-WORKDIR $PHP_SRC_PATH
-RUN make install
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

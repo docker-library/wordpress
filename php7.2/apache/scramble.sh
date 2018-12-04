@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 if [ ! -f "$PATH/s_php" ]; then
         cp /usr/local/bin/php /usr/local/bin/s_php
 fi
@@ -27,5 +29,5 @@ else
     echo "  2. OR create a file at path: /polyscripted"
 
     # Symlink the mount so it's editable
-    ln -s /wordpress /var/www/html
+    ln -s /wordpress /usr/src/wordpress
 fi
