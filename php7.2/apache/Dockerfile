@@ -45,8 +45,6 @@ RUN a2enmod rewrite expires
 WORKDIR $PHP_SRC_PATH
 RUN make install
 
-VOLUME /var/www/html
-
 ENV WORDPRESS_VERSION 5.0
 ENV WORDPRESS_SHA1 67758958f14c1dcefe37ce6558d470a4e142893b
 
