@@ -70,6 +70,12 @@ for phpVersion in "${phpVersions[@]}"; do
 				-e 's!%%CMD%%!'"$cmd"'!g' \
 				"Dockerfile-${base}.template" > "$dir/Dockerfile"
 
+			if [[ "$phpVersion" != 7.3 ]]; then
+				sed -ri \
+					-e '/libzip-dev/d' \
+					"$dir/Dockerfile"
+			fi
+
 			cp -a "$entrypoint" "$dir/docker-entrypoint.sh"
 		)
 
