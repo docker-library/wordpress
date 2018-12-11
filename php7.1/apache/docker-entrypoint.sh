@@ -248,8 +248,8 @@ if (is_numeric($socket)) {
 $user = getenv('WORDPRESS_DB_USER');
 $pass = getenv('WORDPRESS_DB_PASSWORD');
 $dbName = getenv('WORDPRESS_DB_NAME');
-$charset = isset(getenv('WORDPRESS_DB_CHARSET')) ? getenv('WORDPRESS_DB_CHARSET') : 'utf8';
-$collate = isset(getenv('WORDPRESS_DB_COLLATE')) ? getenv('WORDPRESS_DB_COLLATE') : 'utf8_general_ci';
+$charset = !empty(getenv('WORDPRESS_DB_CHARSET')) ? getenv('WORDPRESS_DB_CHARSET') : 'utf8mb4';
+$collate = !empty(getenv('WORDPRESS_DB_COLLATE')) ? getenv('WORDPRESS_DB_COLLATE') : 'utf8mb4_unicode_ci';
 
 $maxTries = 10;
 do {
