@@ -137,8 +137,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		: "${WORDPRESS_DB_USER:=root}"
 		: "${WORDPRESS_DB_PASSWORD:=}"
 		: "${WORDPRESS_DB_NAME:=wordpress}"
-		: "${WORDPRESS_DB_CHARSET:=utf8}"
-		: "${WORDPRESS_DB_COLLATE:=}"
+		: "${WORDPRESS_DB_CHARSET:=utf8mb4}"
+		: "${WORDPRESS_DB_COLLATE:=utf8mb4_unicode_ci}"
 
 		# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 		# https://github.com/docker-library/wordpress/issues/116
@@ -248,6 +248,8 @@ if (is_numeric($socket)) {
 $user = getenv('WORDPRESS_DB_USER');
 $pass = getenv('WORDPRESS_DB_PASSWORD');
 $dbName = getenv('WORDPRESS_DB_NAME');
+$charset = !empty(getenv('WORDPRESS_DB_CHARSET')) ? getenv('WORDPRESS_DB_CHARSET') : 'utf8mb4';
+$collate = !empty(getenv('WORDPRESS_DB_COLLATE')) ? getenv('WORDPRESS_DB_COLLATE') : 'utf8mb4_unicode_ci';
 
 $maxTries = 10;
 do {
@@ -262,7 +264,7 @@ do {
 	}
 } while ($mysql->connect_error);
 
-if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($dbName) . '`')) {
+if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($dbName) . '` CHARACTER SET ' . $charset . ' COLLATE ' . $collate)) {
 	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
 	$mysql->close();
 	exit(1);
