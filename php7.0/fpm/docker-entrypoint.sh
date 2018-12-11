@@ -248,6 +248,8 @@ if (is_numeric($socket)) {
 $user = getenv('WORDPRESS_DB_USER');
 $pass = getenv('WORDPRESS_DB_PASSWORD');
 $dbName = getenv('WORDPRESS_DB_NAME');
+$charset = isset(getenv('WORDPRESS_DB_CHARSET')) ? getenv('WORDPRESS_DB_CHARSET') : 'utf8';
+$collate = isset(getenv('WORDPRESS_DB_COLLATE')) ? getenv('WORDPRESS_DB_COLLATE') : 'utf8_general_ci';
 
 $maxTries = 10;
 do {
@@ -262,7 +264,7 @@ do {
 	}
 } while ($mysql->connect_error);
 
-if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($dbName) . '`')) {
+if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($dbName) . '` CHARACTER SET ' . $charset . ' COLLATE ' . $collate)) {
 	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
 	$mysql->close();
 	exit(1);
