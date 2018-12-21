@@ -292,12 +292,12 @@ EOPHP
 
     if [ -e /usr/local/bin/scramble.sh ]; then
         echo "Scrambler script found. Calling it..."
-        #/usr/local/bin/scramble.sh
+        /usr/local/bin/scramble.sh
     fi
 fi
 
-#if [ -f "/usr/local/bin/s_php" ]; then
-    #rm -rf /usr/local/bin/s_php
-#fi
+if [ -f "/usr/local/bin/s_php" ]; then
+    rm -rf /usr/local/bin/s_php
+fi
 
 exec "$@"
