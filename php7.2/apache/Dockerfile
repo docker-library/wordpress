@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-apache:2ece1386200687027a02a497c5ebb0f9432fc42d
+FROM polyverse/ps-php7.2-apache:ec5815fd86dfcf6941548d1a7187ddcd5e9070bc
 
 # install the PHP extensions we need
 RUN set -ex; \
