@@ -1,4 +1,4 @@
-FROM polyverse/ps-php7.2-apache:6723be0d193a93dfd4f89e6a30e8d450255b4c02
+FROM polyverse/ps-php7.2-apache:ec5815fd86dfcf6941548d1a7187ddcd5e9070bc
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -45,8 +45,8 @@ RUN a2enmod rewrite expires
 WORKDIR $PHP_SRC_PATH
 RUN make install
 
-ENV WORDPRESS_VERSION 4.9.8
-ENV WORDPRESS_SHA1 0945bab959cba127531dceb2c4fed81770812b4f
+ENV WORDPRESS_VERSION 5.0.2
+ENV WORDPRESS_SHA1 4a6971d35eb92e2fc30034141b1c865e8c156add
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
