@@ -11,8 +11,7 @@ What is Moving Target Defense? Read on...
 
 Polyscripted WordPress is sponsored by @Polyverse Corporation.
 
-
-**Introduction: Moving Target Defense**
+### Introduction: Moving Target Defense**
 
 When it comes to programming, it is important to accept an essential fundamental truth: every piece of software is hackable. Ultimately, this means everyone is vulnerable. Given enough time and resources, a vulnerability can always be found and an exploit can be crafted. What makes this attractive to a malicious actor is that a crafted attack can be applied across a wide surface area. With any given vulnerability, a hacker is able to execute an exploit across a range of machines that meet the criteria defined by a presupposed, assumed, and known attack vector. The effort-to-reward ratio is in their favor.
 
@@ -28,7 +27,7 @@ MTD is the practical application of nature&#39;s genetic diversity to technology
 
 The tactics the polymorphic version of Linux applies to compilers, a concept dubbed &quot;Polyscripting&quot; is now applying to language interpreters. Interpreted languages in web applications are ubiquitous and are used for critical tasks, such as information storage and retrieval, as well as providing seamless interactivity via an application&#39;s UI. These languages include PHP, JavaScript and SQL and provide commonplace, easily identifiable, and exploitable areas of publicly distributed web applications. One such exploitation is code injection attacks.
 
-**Code Injection Attacks**
+### Code Injection Attacks
 
 It is easy to point fingers when it comes to security breaches. Whether it&#39;s deprecated legacy code, a zero-day vulnerability, or a forgotten patch, people make mistakes and things happen. These breaches continue to happen, even as the industry focuses on budding new technologies like artificial intelligence, quantum computing, and blockchains in order to stay secure. SQL injection continues, and WordPress vulnerabilities that allow code injection are being taken advantage of. Data is consistently corrupted and stolen and ransomware is a constant plague on both the private and public sectors.
 
@@ -62,7 +61,7 @@ The Struts vulnerability allowed any and all objects to be instantiated by defau
 
 This is part of a practice that Polyverse calls DevSecOps. Safe defaults by developers that prevent dangerous execution paths from being followed. The aforementioned flaw was widely exploited despite a corrective patch being published the same day the vulnerability was announced to the public. An extreme, but all too real example of someone capitalizing on an exploit of this nature.
 
-**Polyscripting — An Introduction**
+### Polyscripting — An Introduction
 
 Rather than endlessly stressing about patching and attempting to juggle all of the vulnerabilities exposed via your application&#39;s attack surface, Polyscripting removes the prerequisite mechanics that allow such attacks to occur. This ensures that even when safeguards prove ineffective, the attack vector was previously undiscovered, or a patch was not applied in a timely manner, the attack will simply not work.
 
@@ -78,7 +77,7 @@ Polyscripting takes a programming language and scrambles (explained later, but u
 
 It comes down to **cause** and **effect**. Whether the cause of code injection is exploiting broken deserialization methods, a legacy vulnerability in a plugin, or an unknown language vulnerability, the responsibility to guard against these falls on the programmer. However, hackers are creative, and even the &quot;most securely written&quot; of programs get hacked. Just look at Facebook, Playstation, Equifax or Target. All companies with massive security teams that genuinely put in the research, time, and effort to stop the **cause** of these attacks, yet they still happen. Polyscripting is a way to stop this **effect.** Normally, the effect of a successful code injection attack would be the execution of the malicious code, with Polyscripting a syntax error gets thrown and no malicious code is run; stopping the malicious effect.
 
-**Standard Workflow**
+### Standard Workflow
 
 In a basic workflow for a standard website running PHP, the PHP interpreter is compiled and loaded onto the web server. The website&#39;s source code is also pushed to the same server. The PHP interpreter then parses and interprets the source code before sending the result elsewhere: to a user, browser, database, etc.
 
@@ -91,7 +90,7 @@ At a very basic level, this is a two-step process:
 **                               **  **1. Build                               2. Run**
 
 
-**Polyscripting Workflow**
+### Polyscripting Workflow
 
 Polyscripting only adds one additional layer to this deployment process. The PHP source code gets scrambled to the polyscripted version and the websites source code gets scrambled to match the unique instance of PHP that was generated. The interpreter for the language (PHP) is changed at compile time and, ideally, the scrambled dictionary is only accessed and only exists **before** being deployed to a web server.
 
@@ -101,15 +100,15 @@ Polyscripting only adds one additional layer to this deployment process. The PHP
 
  ![Polymorphic PHP](https://github.com/archisgore/diagrams/blob/master/Polyscripted%20Wordpress.png)
 
-**Language Scrambling**
+### Language Scrambling 
 
 The process of scrambling a language is beautifully simple. The make-up of a programming language is contained within its syntax and grammar. The keywords and syntax of a language are defined and compiled to make up the words and ordering of word-tokens that a language understands. Programs are then parsed based on this lexical syntax to generate the grammar the further defines a language.
 
-The values of the keywords themselves are arbitrary in any given language. Keywords are defined for the convenience of those writing the code. If you think of these words as just a means to write a language, the values themselves are random. Where &quot;echo&quot; is defined in the lexical grammar, a replacement could be defined with any randomized value. If you replace &quot;echo&quot; in the lex file with &quot;foo&quot; and then run the code: foo &quot;hello world,&quot; it will echo the string given. However if you try to run the code: echo &quot;hello world&quot;, a syntax error will be thrown. The language no longer understands &quot;echo&quot;, but treats the command &quot;foo&quot; as it would previously have treated &quot;echo&quot;.
+The values of the keywords themselves are arbitrary in any given language. Keywords are defined for the convenience of those writing the code. If you think of these words as just a means to write a language, the values themselves are random. Where &quot;echo&quot; is defined in the lexical grammar, a replacement could be defined with any randomized value. If you replace &quot;echo&quot; in the lex file with &quot;foo&quot; and then run the code: foo &quot;hello world,&quot; it will echo the string given. However if you try to run the code: echo &quot;hello world&quot;, a syntax error will be thrown. The language no longer understands ``` echo ```, but treats the command ```foo```; as it would previously have treated ```echo```.
 
 
 
-**Conclusion**
+###Conclusion**
 
 Polyscripting has the potential to be a powerful tool to defend against code-injection attacks. Though scrambling keywords is powerful, there are many other ways to increase the effectiveness of Polyscripting. Scrambling more than just keywords, but also built-in PHP functions, is a feature that would increase Polyscripting&#39;s effectiveness and is a likely addition in the near future. Similarly, scrambling more than the language tokens, but also the grammar and the Abstract Syntax Tree of the language will add an entirely new layer of security to any language Polyscripting is applied to. Polyverse is creating a new standard to expect from programming languages —Polyscripting capabilities.
 
