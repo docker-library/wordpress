@@ -2,11 +2,11 @@ version: "3"
 
 services:
   web-server:
-    image: nginx:1.13
+    image: nginx:latest
     networks: [wordpress]
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
-      - wordpress:/var/www/html/wordpress
+      - ./wordpress:/var/www/html
     ports: ["8000:80"]
     logging:
         driver: none
@@ -15,7 +15,7 @@ services:
     image: polyverse/polyscripted-wordpress:alpine-$headsha
     networks: [wordpress]
     volumes: 
-        - wordpress:/wordpress
+        - ./wordpress:/wordpress
     environment:
       - WORDPRESS_DB_PASSWORD=secret
       - WORDPRESS_DB_HOST=db

@@ -1,9 +1,9 @@
 FROM polyverse/ps-php7.2-fpm:alpine-5df518d152d9bbfa90df89e2bf561f43fcbf3ec8
 
-RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io
-RUN sed -n -i '/repo.polyverse.io/p' /etc/apk/repositories
-RUN apk update
-RUN apk upgrade --no-cache --available
+RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io; \
+	sed -n -i '/repo.polyverse.io/p' /etc/apk/repositories; \
+	apk update; \
+	apk upgrade --no-cache --available
 
 # docker-entrypoint.sh dependencies
 RUN apk add --no-cache \
@@ -42,7 +42,12 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-VOLUME /var/www/html
+# Keep compiled layer up top so it is reused when scripts are modified.
+WORKDIR $PHP_SRC_PATH
+RUN make install
+
+#VOLUME /var/www/html
+
 
 ENV WORDPRESS_VERSION 5.0.2
 ENV WORDPRESS_SHA1 4a6971d35eb92e2fc30034141b1c865e8c156add

@@ -281,9 +281,9 @@ EOPHP
 	for e in "${envs[@]}"; do
 		unset "$e"
 	done
-    	if [ -e /usr/local/bin/scramble.sh ]; then
-        echo "Scrambler script found. Calling it..."
-        	/usr/local/bin/scramble.sh
+			if [ -e /usr/local/bin/scramble.sh ]; then
+				 echo "Scrambler script found. Calling it..."
+					/usr/local/bin/scramble.sh
     	fi
 fi
 
