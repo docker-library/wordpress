@@ -1,5 +1,4 @@
-#FROM polyverse/ps-php7.2-fpm-alpine:2dad2aa3d3232aa50fa23bbf00c4b6b13c0603d8
-FROM test
+FROM polyverse/ps-php7.2-fpm:alpine-625b518a6e8c0c73451e2b213f8c1aa0a390c4ef
 
 RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io
 RUN sed -n -i '/repo.polyverse.io/p' /etc/apk/repositories
