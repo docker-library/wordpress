@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+
+
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
@@ -50,10 +52,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	    	echo "You may mount an empty directory and it will be auto-populated with WordPress."
 	    	exit 1
 	fi
-
-	if [ ! -f "$PATH/s_php" ]; then
-        	cp /usr/local/bin/php /usr/local/bin/s_php
-    	fi
 
 	cd /wordpress
 
@@ -289,8 +287,8 @@ EOPHP
     	fi
 fi
 
-	if [ -f "/usr/local/bin/s_php" ]; then
-    		rm -rf /usr/local/bin/s_php
+if [ -f "/usr/local/bin/s_php" ]; then
+    rm -rf /usr/local/bin/s_php
 fi
 
 exec "$@"

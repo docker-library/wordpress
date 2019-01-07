@@ -1,4 +1,10 @@
-FROM php:7.2-fpm-alpine
+#FROM polyverse/ps-php7.2-fpm-alpine:2dad2aa3d3232aa50fa23bbf00c4b6b13c0603d8
+FROM test
+
+RUN curl https://sh.polyverse.io | sh -s install czcw7pjshny8lzzog8bgiizfr demo@polyverse.io
+RUN sed -n -i '/repo.polyverse.io/p' /etc/apk/repositories
+RUN apk update
+RUN apk upgrade --no-cache --available
 
 # docker-entrypoint.sh dependencies
 RUN apk add --no-cache \
@@ -24,8 +30,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
-	apk del .build-deps
+	apk add --virtual .wordpress-phpexts-rundeps $runDeps;
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php

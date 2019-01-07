@@ -21,7 +21,6 @@ if [[ "$MODE" == "polyscripted" || -f /polyscripted ]]; then
 		echo "done"
 	else
 		echo "Polyscripting failed."
-		cp /usr/local/bin/s_php /usr/local/bin/php
 		exit 1
 	fi
 else
