@@ -1,4 +1,4 @@
-FROM php:%%PHP_VERSION%%-%%VARIANT%%
+FROM php:7.3-fpm-alpine
 
 # docker-entrypoint.sh dependencies
 RUN apk add --no-cache \
@@ -38,11 +38,11 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-%%VARIANT_EXTRAS%%
+
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION %%WORDPRESS_VERSION%%
-ENV WORDPRESS_SHA1 %%WORDPRESS_SHA1%%
+ENV WORDPRESS_VERSION 5.0.2
+ENV WORDPRESS_SHA1 4a6971d35eb92e2fc30034141b1c865e8c156add
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
@@ -55,4 +55,4 @@ RUN set -ex; \
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["%%CMD%%"]
+CMD ["php-fpm"]

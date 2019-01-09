@@ -1,17 +1,13 @@
-FROM php:%%PHP_VERSION%%-%%VARIANT%%
-
-# docker-entrypoint.sh dependencies
-RUN apk add --no-cache \
-# in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
-		bash \
-# BusyBox sed is not sufficient for some of our sed expressions
-		sed
+FROM php:7.3-apache
 
 # install the PHP extensions we need
 RUN set -ex; \
 	\
-	apk add --no-cache --virtual .build-deps \
-		libjpeg-turbo-dev \
+	savedAptMark="$(apt-mark showmanual)"; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		libjpeg-dev \
 		libpng-dev \
 		libzip-dev \
 	; \
@@ -19,14 +15,19 @@ RUN set -ex; \
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
 	docker-php-ext-install gd mysqli opcache zip; \
 	\
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
-	apk del .build-deps
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark; \
+	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+		| awk '/=>/ { print $3 }' \
+		| sort -u \
+		| xargs -r dpkg-query -S \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -rt apt-mark manual; \
+	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -38,11 +39,13 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-%%VARIANT_EXTRAS%%
+
+RUN a2enmod rewrite expires
+
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION %%WORDPRESS_VERSION%%
-ENV WORDPRESS_SHA1 %%WORDPRESS_SHA1%%
+ENV WORDPRESS_VERSION 5.0.2
+ENV WORDPRESS_SHA1 4a6971d35eb92e2fc30034141b1c865e8c156add
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
@@ -55,4 +58,4 @@ RUN set -ex; \
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["%%CMD%%"]
+CMD ["apache2-foreground"]
