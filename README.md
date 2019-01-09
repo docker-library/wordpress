@@ -2,7 +2,7 @@
 
 ## Maintained by: [the Docker Community](https://github.com/docker-library/wordpress)
 
-This is the Git repo of the [Docker "Official Image"](https://docs.docker.com/docker-hub/official_repos/) for [wordpress](https://hub.docker.com/_/wordpress/) (not to be confused with any official wordpress image provided by wordpress upstream). See [the Docker Hub page](https://hub.docker.com/_/wordpress/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
+This iss is the Git repo of the [Docker "Official Image"](https://docs.docker.com/docker-hub/official_repos/) for [wordpress](https://hub.docker.com/_/wordpress/) (not to be confused with any official wordpress image provided by wordpress upstream). See [the Docker Hub page](https://hub.docker.com/_/wordpress/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
 The [full description from Docker Hub](https://hub.docker.com/_/wordpress/) is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/wordpress](https://github.com/docker-library/docs/tree/master/wordpress).
 
