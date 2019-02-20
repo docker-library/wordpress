@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.2-fpm
 
 # install the PHP extensions we need
 RUN apt-get update && apt-get install -y vim git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng-dev libjpeg-dev libz-dev libmemcached-dev libphp-predis && rm -rf /var/lib/apt/lists/* \
@@ -17,8 +17,6 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
-RUN a2enmod rewrite expires
 
 VOLUME /var/www/html
 
@@ -45,4 +43,4 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
 # ENTRYPOINT resets CMD
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+CMD ["php-fpm"]

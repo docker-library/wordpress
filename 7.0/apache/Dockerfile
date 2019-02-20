@@ -25,17 +25,23 @@ VOLUME /var/www/html
 RUN curl -sS https://getcomposer.org/installer | php \
         && mv composer.phar /usr/local/bin/composer
 
-RUN cd /usr/src \
-      && git clone https://github.com/octobercms/october.git \
-      && cd october \
+RUN cd /usr/src \		
+      && git clone https://github.com/octobercms/october.git \		
+      && cd october \		
       && composer install --no-interaction --prefer-dist
 
+# TODO: Use sed to set configuration settings
 COPY config/*.php /usr/src/october/config/
 
-RUN chown -R www-data:www-data /usr/src/october
+RUN chown -R "www-data:www-data" /usr/src/october
+
+# Allow user to set different port
+RUN sed -i "s/80/8080/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
+
+#USER october
 
 # ENTRYPOINT resets CMD
 ENTRYPOINT ["docker-entrypoint.sh"]

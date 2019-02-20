@@ -1,7 +1,7 @@
 FROM php:7.1-fpm
 
 # install the PHP extensions we need
-RUN apt-get update && apt-get install -y vim git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng12-dev libjpeg-dev libz-dev libmemcached-dev libphp-predis && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y vim git-core libsqlite3-dev libpq-dev libmcrypt-dev libpng-dev libjpeg-dev libz-dev libmemcached-dev libphp-predis && rm -rf /var/lib/apt/lists/* \
         && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
         && docker-php-ext-install gd mysqli mcrypt zip mbstring pdo pdo_mysql pdo_sqlite pdo_pgsql json \
 	&& pecl install memcached redis xdebug \
@@ -28,12 +28,18 @@ RUN cd /usr/src \
       && cd october \		
       && composer install --no-interaction --prefer-dist
 
+# TODO: Use sed to set configuration settings
 COPY config/*.php /usr/src/october/config/
 
-RUN chown -R www-data:www-data /usr/src/october
+RUN chown -R "www-data:www-data" /usr/src/october
+
+# Allow user to set different port
+RUN sed -i "s/80/8080/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
+
+#USER october
 
 # ENTRYPOINT resets CMD
 ENTRYPOINT ["docker-entrypoint.sh"]
