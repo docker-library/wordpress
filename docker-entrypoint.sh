@@ -191,9 +191,9 @@ done
 php artisan october:util git pull
 
 # Update OctoberCMS to the latest version
-if [False]
-  php artisan october:update
-fi
+#if [False]
+#  php artisan october:update
+#fi
 
 # One last chown for good measure
 #chown -R $user:$group /var/www/html

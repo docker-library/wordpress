@@ -110,7 +110,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
           echo >&2 '  with -e OCTOBER_DB_HOST=hostname:port?'
           echo >&2 '===================='
           echo >&2 'Using sqlite instead'
-          touch storage/database.sqlite && chwon www-data:www-data storage/database.sqlite
+          touch storage/database.sqlite && chown www-data:www-data storage/database.sqlite
           #exit 1
         elif [ "${OCTOBER_DB_ALLOW_EMPTY_PASSWORD:-}" ne 'yes' && -z "${OCTOBER_DB_PASSWORD:-}" ]; then
           # We have a DB HOST defined, so we're not using sqlite, but no password found
@@ -191,10 +191,12 @@ done
 php artisan october:util git pull
 
 # Update OctoberCMS to the latest version
-php artisan october:update
+#if [False]
+#  php artisan october:update
+#fi
 
 # One last chown for good measure
-chown -R $user:$group /var/www/html
+#chown -R $user:$group /var/www/html
 
 fi
 
