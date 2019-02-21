@@ -89,8 +89,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 	fi
 
-	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
-
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
 	uniqueEnvs=(
