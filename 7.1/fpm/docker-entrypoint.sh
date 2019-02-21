@@ -170,7 +170,7 @@ switch($driver) {
 EOPHP
 
 # Export the variables so we can use them in config files
-export OCTOBER_DB_DRIVER OCTOBER_DB_HOST OCTOBER_DB_PORT OCTOBER_DB_PASSWORD OCTOBER_DB_NAME
+export OCTOBER_DB_DRIVER OCTOBER_DB_HOST OCTOBER_DB_PORT OCTOBER_DB_USER OCTOBER_DB_PASSWORD OCTOBER_DB_NAME
 
 # Bring up the initial OctoberCMS database
 php artisan october:up
