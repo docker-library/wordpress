@@ -110,7 +110,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
           echo >&2 '  with -e OCTOBER_DB_HOST=hostname:port?'
           echo >&2 '===================='
           echo >&2 'Using sqlite instead'
-          touch storage/database.sqlite && chown www-data:www-data storage/database.sqlite
+          touch storage/database.sqlite && chown "$user:$group" storage/database.sqlite
           #exit 1
         elif [ "${OCTOBER_DB_ALLOW_EMPTY_PASSWORD:-}" ne 'yes' && -z "${OCTOBER_DB_PASSWORD:-}" ]; then
           # We have a DB HOST defined, so we're not using sqlite, but no password found

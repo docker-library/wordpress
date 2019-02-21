@@ -35,8 +35,8 @@ COPY config/*.php /usr/src/october/config/
 
 RUN chown -R "www-data:www-data" /usr/src/october
 
-# Allow user to set different port
-RUN sed -i "s/80/8080/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+# TODO: Allow user to set different port
+#RUN sed -i "s/80/8080/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
