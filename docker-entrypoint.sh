@@ -232,7 +232,7 @@ EOPHP
 			set_config 'WP_DEBUG' 1 boolean
 		fi
 
-		TERM=dumb php -- <<'EOPHP'
+		if ! TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 
@@ -273,6 +273,12 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 
 $mysql->close();
 EOPHP
+		then
+			echo >&2
+			echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
+			echo >&2 '  continuing anyways (which might have unexpected results)'
+			echo >&2
+		fi
 	fi
 
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
