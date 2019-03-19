@@ -1,6 +1,6 @@
 # Supported tags and respective `Dockerfile` links
 - `7.1-fpm` ([php7.1/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.1/fpm/Dockerfile))
-- `7.1-apache` ([php7.1/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.1/apache/Dockerfile))
+- `7.1-apache` ([php7.1/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.1/apache/Dockerfile))
 - `7.2-fpm` ([php7.2/fpm/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.2/fpm/Dockerfile))
 - `7.2apache`, `latest` ([php7.2/apache/Dockerfile](https://github.com/Dragontek/octobercms/blob/master/7.2/apache/Dockerfile))
 
