@@ -217,7 +217,7 @@ EOPHP
 				set_config "$unique" "${!uniqVar}"
 			else
 				# if not specified, let's generate a random value
-				currentVal="$(sed -rn -e "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
+				currentVal="$(sed -rn -e "s/define\(\s*(([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\s*\);/\4/p" wp-config.php)"
 				if [ "$currentVal" = 'put your unique phrase here' ]; then
 					set_config "$unique" "$(head -c1m /dev/urandom | sha1sum | cut -d' ' -f1)"
 				fi
