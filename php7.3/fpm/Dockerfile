@@ -64,8 +64,8 @@ RUN { \
 
 VOLUME /var/www/html
 
-ENV WORDPRESS_VERSION 5.2.1
-ENV WORDPRESS_SHA1 65913a39b2e8990ece54efbfa8966fc175085794
+ENV WORDPRESS_VERSION 5.2.2
+ENV WORDPRESS_SHA1 3605bcbe9ea48d714efa59b0eb2d251657e7d5b0
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
