@@ -30,6 +30,8 @@ RUN set -ex; \
 	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
 	apk del .build-deps
 
+# set recommended PHP.ini settings
+# excluding opcache due https://github.com/docker-library/wordpress/issues/407
 # https://codex.wordpress.org/Editing_wp-config.php#Configure_Error_Logging
 RUN { \
 		echo 'error_reporting = 4339'; \
