@@ -62,7 +62,15 @@ RUN { \
 		echo 'html_errors = Off'; \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
 
-RUN a2enmod rewrite expires
+RUN a2enmod rewrite expires remoteip
+
+RUN { \
+        echo 'RemoteIPHeader X-Forwarded-For' ; \
+        echo 'RemoteIPTrustedProxy 10.0.0.0/8' ; \
+        echo 'RemoteIPTrustedProxy 172.16.0.0/12' ; \
+        echo 'RemoteIPTrustedProxy 192.168.0.0/16' ; \
+    } > /etc/apache2/conf-available/remoteip.conf ; \
+    a2enconf remoteip
 
 VOLUME /var/www/html
 
