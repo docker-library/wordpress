@@ -32,9 +32,11 @@ RUN set -ex; \
 
 # set recommended PHP.ini settings
 # excluding opcache due https://github.com/docker-library/wordpress/issues/407
-# https://codex.wordpress.org/Editing_wp-config.php#Configure_Error_Logging
+# https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
 RUN { \
-		echo 'error_reporting = 4339'; \
+# https://www.php.net/manual/en/errorfunc.constants.php
+# https://github.com/docker-library/wordpress/issues/420#issuecomment-517839670
+		echo 'error_reporting = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_RECOVERABLE_ERROR'; \
 		echo 'display_errors = Off'; \
 		echo 'display_startup_errors = Off'; \
 		echo 'log_errors = On'; \
