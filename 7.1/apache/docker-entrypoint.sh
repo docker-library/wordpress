@@ -112,7 +112,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
           echo >&2 'Using sqlite instead'
           touch storage/database.sqlite && chown "$user:$group" storage/database.sqlite
           #exit 1
-        elif [ "${OCTOBER_DB_ALLOW_EMPTY_PASSWORD:-}" ne 'yes' && -z "${OCTOBER_DB_PASSWORD:-}" ]; then
+        elif [ -z "${OCTOBER_DB_PASSWORD:-}" ]; then
           # We have a DB HOST defined, so we're not using sqlite, but no password found
           echo >&2 'error: missing required OCTOBER_DB_PASSWORD environment variable'
           echo >&2 '  Did you forget to -e OCTOBER_DB_ALLOW_EMPTY_PASSWORD=true or  -e OCTOBER_DB_PASSWORD=... ?'
@@ -194,9 +194,6 @@ php artisan october:util git pull
 #if [False]
 #  php artisan october:update
 #fi
-
-# One last chown for good measure
-#chown -R $user:$group /var/www/html
 
 fi
 
