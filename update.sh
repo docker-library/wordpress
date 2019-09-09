@@ -22,10 +22,7 @@ cliSha512="$(curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v${c
 echo "$current (CLI $cliVersion)"
 
 declare -A variantExtras=(
-	[apache]='\nRUN a2enmod rewrite expires\n'
-	[fpm]=''
-	[fpm-alpine]=''
-	[cli]='' # unused
+	[apache]="$(< apache-extras.template)"
 )
 declare -A variantCmds=(
 	[apache]='apache2-foreground'
@@ -40,6 +37,10 @@ declare -A variantBases=(
 	[cli]='cli'
 )
 
+sed_escape_rhs() {
+	sed -e 's/[\/&]/\\&/g; $!a\'$'\n''\\n' <<<"$*" | tr -d '\n'
+}
+
 travisEnv=
 for phpVersion in "${phpVersions[@]}"; do
 	phpVersionDir="$phpVersion"
@@ -49,7 +50,10 @@ for phpVersion in "${phpVersions[@]}"; do
 		dir="$phpVersionDir/$variant"
 		mkdir -p "$dir"
 
-		extras="${variantExtras[$variant]}"
+		extras="${variantExtras[$variant]:-}"
+		if [ -n "$extras" ]; then
+			extras=$'\n'"$extras"$'\n'
+		fi
 		cmd="${variantCmds[$variant]}"
 		base="${variantBases[$variant]}"
 
@@ -65,7 +69,7 @@ for phpVersion in "${phpVersions[@]}"; do
 			-e 's!%%VARIANT%%!'"$variant"'!g' \
 			-e 's!%%WORDPRESS_CLI_VERSION%%!'"$cliVersion"'!g' \
 			-e 's!%%WORDPRESS_CLI_SHA512%%!'"$cliSha512"'!g' \
-			-e 's!%%VARIANT_EXTRAS%%!'"$extras"'!g' \
+			-e 's!%%VARIANT_EXTRAS%%!'"$(sed_escape_rhs "$extras")"'!g' \
 			-e 's!%%CMD%%!'"$cmd"'!g' \
 			"Dockerfile-${base}.template" > "$dir/Dockerfile"
 
