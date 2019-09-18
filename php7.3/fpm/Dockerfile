@@ -1,5 +1,14 @@
 FROM php:7.3-fpm
 
+# persistent dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+# Ghostscript is required for rendering PDF previews
+		ghostscript \
+	; \
+	rm -rf /var/lib/apt/lists/*
+
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
