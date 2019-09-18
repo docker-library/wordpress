@@ -1,11 +1,13 @@
 FROM php:7.1-fpm-alpine
 
-# docker-entrypoint.sh dependencies
+# persistent dependencies
 RUN apk add --no-cache \
 # in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
 		bash \
 # BusyBox sed is not sufficient for some of our sed expressions
-		sed
+		sed \
+# Ghostscript is required for rendering PDF previews
+		ghostscript
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
