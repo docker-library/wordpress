@@ -1,15 +1,25 @@
 FROM php:7.2-alpine
 
-# install the PHP extensions we need
+# install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
 	apk add --no-cache --virtual .build-deps \
+		$PHPIZE_DEPS \
+		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
-	docker-php-ext-install gd mysqli opcache zip; \
+	docker-php-ext-install \
+		bcmath \
+		exif \
+		gd \
+		mysqli \
+		zip \
+	; \
+	pecl install imagick-3.4.4; \
+	docker-php-ext-enable imagick; \
 	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
@@ -21,15 +31,21 @@ RUN set -ex; \
 	apk del .build-deps
 
 # set recommended PHP.ini settings
-# see https://secure.php.net/manual/en/opcache.installation.php
+# excluding opcache due https://github.com/docker-library/wordpress/issues/407
+# https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
 RUN { \
-		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
-		echo 'opcache.revalidate_freq=2'; \
-		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+# https://www.php.net/manual/en/errorfunc.constants.php
+# https://github.com/docker-library/wordpress/issues/420#issuecomment-517839670
+		echo 'error_reporting = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_RECOVERABLE_ERROR'; \
+		echo 'display_errors = Off'; \
+		echo 'display_startup_errors = Off'; \
+		echo 'log_errors = On'; \
+		echo 'error_log = /dev/stderr'; \
+		echo 'log_errors_max_len = 1024'; \
+		echo 'ignore_repeated_errors = On'; \
+		echo 'ignore_repeated_source = Off'; \
+		echo 'html_errors = Off'; \
+	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 # install wp-cli dependencies
 RUN apk add --no-cache \
@@ -51,8 +67,8 @@ VOLUME /var/www/html
 # sub   rsa2048 2018-05-31 [E]
 ENV WORDPRESS_CLI_GPG_KEY 63AF7AA15067C05616FDDD88A3A2E8F226F0BC06
 
-ENV WORDPRESS_CLI_VERSION 2.0.1
-ENV WORDPRESS_CLI_SHA512 21b9c1d65993f88bf81cc73c0a832532cc424bea8c15563a77af1905d0dc4714f2af679dfadedd3b683f3968902b4b6be4c6cf94285da9f5582b30c1dac5397f
+ENV WORDPRESS_CLI_VERSION 2.3.0
+ENV WORDPRESS_CLI_SHA512 fdf1c6e7d33665fc9c6202a91fdebc72be6ebad12949ecf0280765bf24819e7ca2072e6834abd3848bceaae0f7aa1896322c837ae5a5b66dd69b760c310e4a30
 
 RUN set -ex; \
 	\

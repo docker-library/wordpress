@@ -46,6 +46,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 
 	if [ ! -e index.php ] && [ ! -e wp-includes/version.php ]; then
+		# if the directory exists and WordPress doesn't appear to be installed AND the permissions of it are root:root, let's chown it (likely a Docker-created directory)
+		if [ "$(id -u)" = '0' ] && [ "$(stat -c '%u:%g' .)" = '0:0' ]; then
+			chown "$user:$group" .
+		fi
+
 		echo >&2 "WordPress not found in $PWD - copying now..."
 		if [ -n "$(ls -A)" ]; then
 			echo >&2 "WARNING: $PWD is not empty! (copying anyhow)"
@@ -83,8 +88,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			chown "$user:$group" .htaccess
 		fi
 	fi
-
-	# TODO handle WordPress upgrades magically in the same way, but only if wp-includes/version.php's $wp_version is less than /usr/src/wordpress/wp-includes/version.php's $wp_version
 
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "WORDPRESS_" prefix (ie, "WORDPRESS_AUTH_KEY")
@@ -214,7 +217,7 @@ EOPHP
 				set_config "$unique" "${!uniqVar}"
 			else
 				# if not specified, let's generate a random value
-				currentVal="$(sed -rn -e "s/define\((([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\);/\4/p" wp-config.php)"
+				currentVal="$(sed -rn -e "s/define\(\s*(([\'\"])$unique\2\s*,\s*)(['\"])(.*)\3\s*\);/\4/p" wp-config.php)"
 				if [ "$currentVal" = 'put your unique phrase here' ]; then
 					set_config "$unique" "$(head -c1m /dev/urandom | sha1sum | cut -d' ' -f1)"
 				fi
@@ -229,7 +232,7 @@ EOPHP
 			set_config 'WP_DEBUG' 1 boolean
 		fi
 
-		TERM=dumb php -- <<'EOPHP'
+		if ! TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 
@@ -272,6 +275,12 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 
 $mysql->close();
 EOPHP
+		then
+			echo >&2
+			echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
+			echo >&2 '  continuing anyways (which might have unexpected results)'
+			echo >&2
+		fi
 	fi
 
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)

@@ -19,11 +19,10 @@ cliVersion="$(
 )"
 cliSha512="$(curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v${cliVersion}/wp-cli-${cliVersion}.phar.sha512")"
 
+echo "$current (CLI $cliVersion)"
+
 declare -A variantExtras=(
-	[apache]='\nRUN a2enmod rewrite expires\n'
-	[fpm]=''
-	[fpm-alpine]=''
-	[cli]='' # unused
+	[apache]="$(< apache-extras.template)"
 )
 declare -A variantCmds=(
 	[apache]='apache2-foreground'
@@ -38,6 +37,10 @@ declare -A variantBases=(
 	[cli]='cli'
 )
 
+sed_escape_rhs() {
+	sed -e 's/[\/&]/\\&/g; $!a\'$'\n''\\n' <<<"$*" | tr -d '\n'
+}
+
 travisEnv=
 for phpVersion in "${phpVersions[@]}"; do
 	phpVersionDir="$phpVersion"
@@ -47,7 +50,10 @@ for phpVersion in "${phpVersions[@]}"; do
 		dir="$phpVersionDir/$variant"
 		mkdir -p "$dir"
 
-		extras="${variantExtras[$variant]}"
+		extras="${variantExtras[$variant]:-}"
+		if [ -n "$extras" ]; then
+			extras=$'\n'"$extras"$'\n'
+		fi
 		cmd="${variantCmds[$variant]}"
 		base="${variantBases[$variant]}"
 
@@ -56,22 +62,26 @@ for phpVersion in "${phpVersions[@]}"; do
 			entrypoint='cli-entrypoint.sh'
 		fi
 
-		(
-			set -x
+		sed -r \
+			-e 's!%%WORDPRESS_VERSION%%!'"$current"'!g' \
+			-e 's!%%WORDPRESS_SHA1%%!'"$sha1"'!g' \
+			-e 's!%%PHP_VERSION%%!'"$phpVersion"'!g' \
+			-e 's!%%VARIANT%%!'"$variant"'!g' \
+			-e 's!%%WORDPRESS_CLI_VERSION%%!'"$cliVersion"'!g' \
+			-e 's!%%WORDPRESS_CLI_SHA512%%!'"$cliSha512"'!g' \
+			-e 's!%%VARIANT_EXTRAS%%!'"$(sed_escape_rhs "$extras")"'!g' \
+			-e 's!%%CMD%%!'"$cmd"'!g' \
+			"Dockerfile-${base}.template" > "$dir/Dockerfile"
 
-			sed -r \
-				-e 's!%%WORDPRESS_VERSION%%!'"$current"'!g' \
-				-e 's!%%WORDPRESS_SHA1%%!'"$sha1"'!g' \
-				-e 's!%%PHP_VERSION%%!'"$phpVersion"'!g' \
-				-e 's!%%VARIANT%%!'"$variant"'!g' \
-				-e 's!%%WORDPRESS_CLI_VERSION%%!'"$cliVersion"'!g' \
-				-e 's!%%WORDPRESS_CLI_SHA512%%!'"$cliSha512"'!g' \
-				-e 's!%%VARIANT_EXTRAS%%!'"$extras"'!g' \
-				-e 's!%%CMD%%!'"$cmd"'!g' \
-				"Dockerfile-${base}.template" > "$dir/Dockerfile"
+		case "$phpVersion" in
+			7.1 | 7.2 )
+				sed -ri \
+					-e '/libzip-dev/d' \
+					"$dir/Dockerfile"
+				;;
+		esac
 
-			cp -a "$entrypoint" "$dir/docker-entrypoint.sh"
-		)
+		cp -a "$entrypoint" "$dir/docker-entrypoint.sh"
 
 		travisEnv+='\n  - VARIANT='"$dir"
 	done

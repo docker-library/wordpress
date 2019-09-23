@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.3-apache
 
 # persistent dependencies
 RUN set -eux; \
@@ -19,6 +19,7 @@ RUN set -ex; \
 		libjpeg-dev \
 		libmagickwand-dev \
 		libpng-dev \
+		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
