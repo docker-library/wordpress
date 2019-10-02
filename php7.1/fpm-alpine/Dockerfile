@@ -14,12 +14,17 @@ RUN set -ex; \
 	\
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
+		freetype-dev \
 		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 	; \
 	\
-	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+	docker-php-ext-configure gd \
+		--with-freetype-dir=/usr \
+		--with-jpeg-dir=/usr \
+		--with-png-dir=/usr \
+	; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
