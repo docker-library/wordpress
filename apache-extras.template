@@ -1,4 +1,5 @@
 RUN set -eux; \
+        sed -i 's/Require\ local/#Require\ local/g' ${APACHE_CONFDIR}/mods-available/status.conf; \
 	a2enmod rewrite expires; \
 	\
 # https://httpd.apache.org/docs/2.4/mod/mod_remoteip.html
