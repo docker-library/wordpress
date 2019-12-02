@@ -10,6 +10,10 @@ env:
   - VARIANT=php7.3/fpm
   - VARIANT=php7.3/fpm-alpine
   - VARIANT=php7.3/cli
+  - VARIANT=php7.4/apache
+  - VARIANT=php7.4/fpm
+  - VARIANT=php7.4/fpm-alpine
+  - VARIANT=php7.4/cli
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
