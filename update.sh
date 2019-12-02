@@ -74,7 +74,7 @@ for phpVersion in "${phpVersions[@]}"; do
 			"Dockerfile-${base}.template" > "$dir/Dockerfile"
 
 		case "$phpVersion" in
-			7.1 | 7.2 )
+			7.2 )
 				sed -ri \
 					-e '/libzip-dev/d' \
 					"$dir/Dockerfile"
