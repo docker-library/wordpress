@@ -80,6 +80,13 @@ for phpVersion in "${phpVersions[@]}"; do
 					"$dir/Dockerfile"
 				;;
 		esac
+		case "$phpVersion" in
+			7.2 | 7.3 )
+				sed -ri \
+					-e 's!gd --with-freetype --with-jpeg!gd --with-freetype-dir=/usr --with-jpeg-dir=/usr --with-png-dir=/usr!g' \
+					"$dir/Dockerfile"
+				;;
+		esac
 
 		cp -a "$entrypoint" "$dir/docker-entrypoint.sh"
 
