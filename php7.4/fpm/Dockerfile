@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.4-fpm
 
 # persistent dependencies
 RUN set -eux; \
@@ -20,13 +20,10 @@ RUN set -ex; \
 		libjpeg-dev \
 		libmagickwand-dev \
 		libpng-dev \
+		libzip-dev \
 	; \
 	\
-	docker-php-ext-configure gd \
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
-	; \
+	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \

@@ -1,4 +1,4 @@
-FROM php:7.1-alpine
+FROM php:7.4-alpine
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
@@ -9,13 +9,10 @@ RUN set -ex; \
 		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
+		libzip-dev \
 	; \
 	\
-	docker-php-ext-configure gd \
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
-	; \
+	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \

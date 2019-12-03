@@ -1,4 +1,4 @@
-FROM php:7.1-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 # persistent dependencies
 RUN apk add --no-cache \
@@ -18,13 +18,10 @@ RUN set -ex; \
 		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
+		libzip-dev \
 	; \
 	\
-	docker-php-ext-configure gd \
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
-	; \
+	docker-php-ext-configure gd --with-freetype --with-jpeg; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \

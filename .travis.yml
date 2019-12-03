@@ -2,10 +2,6 @@ language: bash
 services: docker
 
 env:
-  - VARIANT=php7.1/apache
-  - VARIANT=php7.1/fpm
-  - VARIANT=php7.1/fpm-alpine
-  - VARIANT=php7.1/cli
   - VARIANT=php7.2/apache
   - VARIANT=php7.2/fpm
   - VARIANT=php7.2/fpm-alpine
@@ -14,6 +10,10 @@ env:
   - VARIANT=php7.3/fpm
   - VARIANT=php7.3/fpm-alpine
   - VARIANT=php7.3/cli
+  - VARIANT=php7.4/apache
+  - VARIANT=php7.4/fpm
+  - VARIANT=php7.4/fpm-alpine
+  - VARIANT=php7.4/cli
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
