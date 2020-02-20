@@ -12,14 +12,24 @@ phpVersions=( "${phpVersions[@]%/}" )
 current="$(curl -fsSL 'https://api.wordpress.org/core/version-check/1.7/' | jq -r '.offers[0].current')"
 sha1="$(curl -fsSL "https://wordpress.org/wordpress-$current.tar.gz.sha1")"
 
-cliVersion="$(
+cliPossibleVersions=( $(
 	git ls-remote --tags 'https://github.com/wp-cli/wp-cli.git' \
 		| sed -r 's!^[^\t]+\trefs/tags/v([^^]+).*!\1!g' \
-		| tail -1
-)"
-cliSha512="$(curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v${cliVersion}/wp-cli-${cliVersion}.phar.sha512")"
-
-echo "$current (CLI $cliVersion)"
+		| sort --version-sort --reverse
+	)
+)
+cliVersion=
+cliSha512=
+for cliPosVer in "${cliPossibleVersions[@]}"; do
+	cliUrl="https://github.com/wp-cli/wp-cli/releases/download/v${cliPosVer}/wp-cli-${cliPosVer}.phar.sha512"
+	if cliSha512="$(curl -fsSL "$cliUrl" 2>/dev/null)"; then
+		cliVersion="$cliPosVer"
+		break
+	fi
+done
+echo "$current (CLI '$cliVersion')"
+# make sure we get a cliVersion
+[ -n "$cliVersion" ]
 
 declare -A variantExtras=(
 	[apache]="$(< apache-extras.template)"
