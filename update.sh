@@ -51,7 +51,6 @@ sed_escape_rhs() {
 	sed -e 's/[\/&]/\\&/g; $!a\'$'\n''\\n' <<<"$*" | tr -d '\n'
 }
 
-travisEnv=
 for phpVersion in "${phpVersions[@]}"; do
 	phpVersionDir="$phpVersion"
 	phpVersion="${phpVersion#php}"
@@ -99,10 +98,5 @@ for phpVersion in "${phpVersions[@]}"; do
 		esac
 
 		cp -a "$entrypoint" "$dir/docker-entrypoint.sh"
-
-		travisEnv+='\n  - VARIANT='"$dir"
 	done
 done
-
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-echo "$travis" > .travis.yml
