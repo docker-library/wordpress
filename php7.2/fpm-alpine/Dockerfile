@@ -38,7 +38,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
+	apk add --virtual .wordpress-phpexts-rundeps $runDeps imagemagick; \
 	apk del .build-deps
 
 # set recommended PHP.ini settings
