@@ -7,7 +7,9 @@ RUN apk add --no-cache \
 # BusyBox sed is not sufficient for some of our sed expressions
 		sed \
 # Ghostscript is required for rendering PDF previews
-		ghostscript
+		ghostscript \
+# Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
+		imagemagick
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
@@ -38,7 +40,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --virtual .wordpress-phpexts-rundeps $runDeps imagemagick; \
+	apk add --virtual .wordpress-phpexts-rundeps $runDeps; \
 	apk del .build-deps
 
 # set recommended PHP.ini settings
