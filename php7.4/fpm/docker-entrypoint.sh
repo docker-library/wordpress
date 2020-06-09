@@ -52,7 +52,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 
 		echo >&2 "WordPress not found in $PWD - copying now..."
-		if [ -n "$(ls -A)" ]; then
+		if [ -n "$(find -mindepth 1 -maxdepth 1 -not -name wp-content)" ]; then
 			echo >&2 "WARNING: $PWD is not empty! (copying anyhow)"
 		fi
 		sourceTarArgs=(

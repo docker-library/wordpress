@@ -60,7 +60,6 @@ RUN set -ex; \
 	mkdir -p /var/www/html; \
 	chown -R www-data:www-data /var/www/html
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 # https://make.wordpress.org/cli/2018/05/31/gpg-signature-change/
 # pub   rsa2048 2018-05-31 [SC]
@@ -92,6 +91,8 @@ RUN set -ex; \
 	apk del .fetch-deps; \
 	\
 	wp --allow-root --version
+
+VOLUME /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
