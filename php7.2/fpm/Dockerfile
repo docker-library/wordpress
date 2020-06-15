@@ -72,7 +72,6 @@ RUN { \
 		echo 'html_errors = Off'; \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
 
-VOLUME /var/www/html
 
 ENV WORDPRESS_VERSION 5.4.2
 ENV WORDPRESS_SHA1 e5631f812232fbd45d3431783d3db2e0d5670d2d
@@ -83,7 +82,17 @@ RUN set -ex; \
 # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
 	tar -xzf wordpress.tar.gz -C /usr/src/; \
 	rm wordpress.tar.gz; \
-	chown -R www-data:www-data /usr/src/wordpress
+	chown -R www-data:www-data /usr/src/wordpress; \
+# pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
+	mkdir wp-content; \
+	for dir in /usr/src/wordpress/wp-content/*/; do \
+		dir="$(basename "${dir%/}")"; \
+		mkdir "wp-content/$dir"; \
+	done; \
+	chown -R www-data:www-data wp-content; \
+	chmod -R 777 wp-content
+
+VOLUME /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
