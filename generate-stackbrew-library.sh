@@ -3,7 +3,7 @@ set -eu
 
 # https://wordpress.org/about/requirements/
 # https://wordpress.org/support/update-php/#before-you-update-your-php-version
-defaultPhpVersion='php7.3'
+defaultPhpVersion='php7.4'
 defaultVariant='apache'
 
 self="$(basename "$BASH_SOURCE")"
