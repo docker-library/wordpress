@@ -94,8 +94,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 
 
-ENV WORDPRESS_VERSION 5.4.2
-ENV WORDPRESS_SHA1 e5631f812232fbd45d3431783d3db2e0d5670d2d
+ENV WORDPRESS_VERSION 5.5
+ENV WORDPRESS_SHA1 03fe1a139b3cd987cc588ba95fab2460cba2a89e
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
