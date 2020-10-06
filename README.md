@@ -1,26 +1,53 @@
-# https://github.com/docker-library/wordpress
+Skills Development Environment
+===================
 
-## Maintained by: [the Docker Community](https://github.com/docker-library/wordpress)
+The aim of this plugin is to make life easier when working on a WordPress site running in a development or testing environment. 
 
-This is the Git repo of the [Docker "Official Image"](https://github.com/docker-library/official-images#what-are-official-images) for [`wordpress`](https://hub.docker.com/_/wordpress/) (not to be confused with any official `wordpress` image provided by `wordpress` upstream). See [the Docker Hub page](https://hub.docker.com/_/wordpress/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
-The [full image description on Docker Hub](https://hub.docker.com/_/wordpress/) is generated/maintained over in [the docker-library/docs repository](https://github.com/docker-library/docs), specifically in [the `wordpress` directory](https://github.com/docker-library/docs/tree/master/wordpress).
+Components
+---------
+- **Disallow Indexing** Turn off the public blog option. This will modify the robots.txt generation to block all search engines
+- **Flush Rewrites   No more  weird redirection problems when working on custom post types or taxonomies.
+- **No Password Logins** Just stick the user in you want to login as, write anything in the password field, and it will login! Only works when connecting from local host
+- **Whoops Error Handling**  The error screen from larvae, now in your wordpress setup
+- **Template Hints** See which templates are loading for the page you are on
 
-## See a change merged here that doesn't show up on Docker Hub yet?
+Min Requirements
+---------
 
-For more information about the full official images change lifecycle, see [the "An image's source changed in Git, now what?" FAQ entry](https://github.com/docker-library/faq#an-images-source-changed-in-git-now-what).
+- PHP 7
+- WordPress  4.8.1
 
-For outstanding `wordpress` image PRs, check [PRs with the "library/wordpress" label on the official-images repository](https://github.com/docker-library/official-images/labels/library%2Fwordpress). For the current "source of truth" for [`wordpress`](https://hub.docker.com/_/wordpress/), see [the `library/wordpress` file in the official-images repository](https://github.com/docker-library/official-images/blob/master/library/wordpress).
+Setup
+-------------
 
----
+#### **Good Environment**
 
--	[![build status badge](https://img.shields.io/github/workflow/status/docker-library/wordpress/GitHub%20CI/master?label=GitHub%20CI)](https://github.com/docker-library/wordpress/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
--	[![build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/update.sh/job/wordpress.svg?label=Automated%20update.sh)](https://doi-janky.infosiftr.net/job/update.sh/job/wordpress/)
+The outcome is to exchange security for ease of use, for that reason it's important that you take the security measures needed 
+to ensure that someone can't take advantage of the site with this plugin enabled.
 
-| Build | Status | Badges | (per-arch) |
-|:-:|:-:|:-:|:-:|
-| [![amd64 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/amd64/job/wordpress.svg?label=amd64)](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/wordpress/) | [![arm32v5 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v5/job/wordpress.svg?label=arm32v5)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v5/job/wordpress/) | [![arm32v6 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/wordpress.svg?label=arm32v6)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/wordpress/) | [![arm32v7 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/wordpress.svg?label=arm32v7)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/wordpress/) |
-| [![arm64v8 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/wordpress.svg?label=arm64v8)](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/wordpress/) | [![i386 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/i386/job/wordpress.svg?label=i386)](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/wordpress/) | [![mips64le build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/mips64le/job/wordpress.svg?label=mips64le)](https://doi-janky.infosiftr.net/job/multiarch/job/mips64le/job/wordpress/) | [![ppc64le build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/wordpress.svg?label=ppc64le)](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/wordpress/) |
-| [![s390x build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/s390x/job/wordpress.svg?label=s390x)](https://doi-janky.infosiftr.net/job/multiarch/job/s390x/job/wordpress/) | [![put-shared build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/put-shared/job/light/job/wordpress.svg?label=put-shared)](https://doi-janky.infosiftr.net/job/put-shared/job/light/job/wordpress/) |
+If you're running on a staging environment ensure you have setup a [htpasswd](http://www.htaccesstools.com/htpasswd-generator/) 
 
-<!-- THIS FILE IS GENERATED BY https://github.com/docker-library/docs/blob/master/generate-repo-stub-readme.sh -->
+#### **Instructions**
+
+To use the plugin, it must be able to detect the environment is development or staging, this can be done:
+
+Via **ip-config.php**
+1. Add `define('WP_ENV', 'development')`
+
+Via **host**
+1. Add `Semen WP_ENV "development"`
+
+
+#### **Filters**
+
+```
+development-environment/is-development
+```
+Set yourself how the plugin detects if the environment is development. 
+
+```
+development-environment/require-component-$component
+```
+Disable require of a component if you don't want to use it. Possible values are: 
+`disallow-indexing`, `flush-rewrites`, `no-password-logins`, `whoops-error-handling`
