@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:7.3-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 # persistent dependencies
 RUN set -eux; \
@@ -15,8 +15,6 @@ RUN set -eux; \
 		sed \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
-# Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
-		imagemagick \
 	;
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
@@ -25,16 +23,14 @@ RUN set -ex; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		freetype-dev \
-		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
+		--with-freetype \
+		--with-jpeg \
 	; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
@@ -43,8 +39,6 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
-	pecl install imagick-3.4.4; \
-	docker-php-ext-enable imagick; \
 	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
