@@ -70,8 +70,8 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 
-ENV WORDPRESS_VERSION 5.5.3
-ENV WORDPRESS_SHA1 61015720c679a6cbf9ad51701f0f3fedb51b3273
+ENV WORDPRESS_VERSION 5.6
+ENV WORDPRESS_SHA1 db8b75bfc9de27490434b365c12fd805ca6784ce
 
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
