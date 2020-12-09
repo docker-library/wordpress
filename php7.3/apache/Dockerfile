@@ -91,7 +91,15 @@ RUN set -eux; \
 	a2enconf remoteip; \
 # https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
 # (replace all instances of "%h" with "%a" in LogFormat)
-	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
+	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +; \
+# apply some sensible security defaults: 403 hidden files/dirs + common backup/source filetypes
+        { \
+                echo 'RedirectMatch 403 /\..*$'; \
+                echo '<FilesMatch "(\.(bak|back|backup|config|dist|fla|inc|ini|log|psd|sh|sql|swp)|~)$">'; \
+                echo 'Require all denied'; \
+                echo '</FilesMatch>'; \
+        } > /etc/apache2/conf-available/forbidden.conf; \
+        a2enconf forbidden
 
 
 ENV WORDPRESS_VERSION 5.6
