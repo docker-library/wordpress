@@ -103,6 +103,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		WORDPRESS_DB_NAME
 		WORDPRESS_DB_CHARSET
 		WORDPRESS_DB_COLLATE
+		WORDPRESS_DB_SSL
 		"${uniqueEnvs[@]/#/WORDPRESS_}"
 		WORDPRESS_TABLE_PREFIX
 		WORDPRESS_DEBUG
@@ -137,11 +138,18 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		: "${WORDPRESS_DB_NAME:=wordpress}"
 		: "${WORDPRESS_DB_CHARSET:=utf8}"
 		: "${WORDPRESS_DB_COLLATE:=}"
+		: "${WORDPRESS_DB_SSL:=no}"
 
 		# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
 		# https://github.com/docker-library/wordpress/issues/116
 		# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
 		sed -ri -e 's/\r$//' wp-config*
+
+		if [ $WORDPRESS_DB_SSL == "yes" ]; then
+			WORDPRESS_CONFIG_EXTRA="
+${WORDPRESS_CONFIG_EXTRA}
+define('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL);"
+		fi
 
 		if [ ! -e wp-config.php ]; then
 			awk '
@@ -246,11 +254,12 @@ if (is_numeric($socket)) {
 $user = getenv('WORDPRESS_DB_USER');
 $pass = getenv('WORDPRESS_DB_PASSWORD');
 $dbName = getenv('WORDPRESS_DB_NAME');
+$flags = getenv('WORDPRESS_DB_SSL') === 'yes' ? MYSQLI_CLIENT_SSL : 0;
 
 $maxTries = 10;
 do {
-	$mysql = new mysqli($host, $user, $pass, '', $port, $socket);
-	if ($mysql->connect_error) {
+	$mysql = mysqli_init();
+	if (!$mysql->real_connect($host, $user, $pass, '', $port, $socket, $flags)) {
 		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
 		--$maxTries;
 		if ($maxTries <= 0) {
