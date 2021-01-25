@@ -64,6 +64,7 @@ RUN set -ex; \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libzip-dev \
+		libmcrypt-dev \
 	; \
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -77,6 +78,7 @@ RUN set -ex; \
 {{ ) else "" end -}}
 		libpng-dev \
 		libzip-dev \
+		libmcrypt-dev \
 	; \
 {{ ) end -}}
 	\
@@ -101,6 +103,8 @@ RUN set -ex; \
 	pecl install imagick-3.4.4; \
 	docker-php-ext-enable imagick; \
 {{ ) else "" end -}}
+	pecl install mcrypt-1.0.4; \
+	docker-php-ext-enable mcrypt; \
 	\
 {{ if is_alpine then ( -}}
 	runDeps="$( \
