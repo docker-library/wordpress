@@ -82,7 +82,7 @@ for version; do
 
 	if [ "$version" = 'beta' ] && latestVersion="$(jq -r '.latest.version // ""' versions.json)" && [ "$latestVersion" = "$fullVersion" ]; then
 		# "beta" channel even with release, skip it
-		: #continue # TODO once something newer than 5.6 is released, this should be restored (explicit "beta" for allowing pre-release testing of "wp-config-docker.php")
+		continue
 	fi
 
 	versionAliases=()
