@@ -251,7 +251,7 @@ RUN set -ex; \
 
 VOLUME /var/www/html
 
-{{ if env.version == "beta" then ( -}}
+{{ if env.version != "cli" then ( -}}
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 {{ ) else "" end -}}
 COPY docker-entrypoint.sh /usr/local/bin/

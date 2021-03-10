@@ -52,11 +52,8 @@ for version; do
 
 			if [ "$version" = 'cli' ]; then
 				cp -a cli-entrypoint.sh "$dir/docker-entrypoint.sh"
-			elif [ "$version" = 'beta' ]; then
-				cp -a docker-entrypoint-ng.sh "$dir/docker-entrypoint.sh"
-				cp -a wp-config-docker.php "$dir/"
 			else
-				cp -a docker-entrypoint.sh "$dir/"
+				cp -a docker-entrypoint.sh wp-config-docker.php "$dir/"
 			fi
 		done
 	done
