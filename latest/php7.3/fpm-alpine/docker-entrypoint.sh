@@ -86,6 +86,49 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 			fi
 		done
 	fi
+
+	if ! TERM=dumb php -- <<'EOPHP'
+<?php
+// database might not exist, so let's try creating it (just to be safe)
+$stderr = fopen('php://stderr', 'w');
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Alternate_Port
+//   "hostname:port"
+// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Sockets_or_Pipes
+//   "hostname:unix-socket-path"
+list($host, $socket) = getenv('WORDPRESS_DB_HOST') ? explode(':', getenv('WORDPRESS_DB_HOST'), 2) : 'mysql';
+$port = 0;
+if (is_numeric($socket)) {
+	$port = (int) $socket;
+	$socket = null;
+}
+$user = getenv('WORDPRESS_DB_USER') ?: 'root';
+$pass = getenv('WORDPRESS_DB_PASSWORD') ?: '';
+$dbName = getenv('WORDPRESS_DB_NAME') ?: 'wordpress';
+$maxTries = 10;
+do {
+	$mysql = new mysqli($host, $user, $pass, '', $port, $socket);
+	if ($mysql->connect_error) {
+		fwrite($stderr, "\n" . 'MySQL Connection Error: (' . $mysql->connect_errno . ') ' . $mysql->connect_error . "\n");
+		--$maxTries;
+		if ($maxTries <= 0) {
+			exit(1);
+		}
+		sleep(3);
+	}
+} while ($mysql->connect_error);
+if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_string($dbName) . '`')) {
+	fwrite($stderr, "\n" . 'MySQL "CREATE DATABASE" Error: ' . $mysql->error . "\n");
+	$mysql->close();
+	exit(1);
+}
+$mysql->close();
+EOPHP
+	then
+		echo >&2
+		echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
+		echo >&2 '  continuing anyways (which might have unexpected results)'
+		echo >&2
+	fi
 fi
 
 exec "$@"
