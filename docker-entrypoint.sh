@@ -87,7 +87,13 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 		done
 	fi
 
-	if ! TERM=dumb php -- <<'EOPHP'
+	WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST-"mysql"}
+	WORDPRESS_DB_USER=${WORDPRESS_DB_USER-"root"}
+	WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-""}
+	WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"mysql"}
+
+	if [ -z ${SKIP_DB_CREATION+x} ] then
+		if ! TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
 $stderr = fopen('php://stderr', 'w');
@@ -123,11 +129,12 @@ if (!$mysql->query('CREATE DATABASE IF NOT EXISTS `' . $mysql->real_escape_strin
 }
 $mysql->close();
 EOPHP
-	then
-		echo >&2
-		echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
-		echo >&2 '  continuing anyways (which might have unexpected results)'
-		echo >&2
+		then
+			echo >&2
+			echo >&2 "WARNING: unable to establish a database connection to '$WORDPRESS_DB_HOST'"
+			echo >&2 '  continuing anyways (which might have unexpected results)'
+			echo >&2
+		fi
 	fi
 fi
 

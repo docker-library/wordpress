@@ -44,5 +44,7 @@ jobs:
         run: ${{ matrix.runs.history }}
       - name: Test ${{ matrix.name }}
         run: ${{ matrix.runs.test }}
+        env:
+          SKIP_DB_CREATION: true
       - name: '"docker images"'
         run: ${{ matrix.runs.images }}
