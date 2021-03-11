@@ -92,7 +92,7 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 	WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-""}
 	WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"mysql"}
 
-	if [ -z ${SKIP_DB_CREATION+x} ] then
+	if [ -z ${SKIP_DB_CREATION+x} ]; then
 		if ! TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
