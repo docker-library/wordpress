@@ -87,12 +87,12 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 		done
 	fi
 
-	export WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST-"mysql"}
-	export WORDPRESS_DB_USER=${WORDPRESS_DB_USER-"root"}
-	export WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-""}
-	export WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"mysql"}
-
 	if [ -z ${SKIP_DB_CREATION+x} ]; then
+		export WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST-"mysql"}
+		export WORDPRESS_DB_USER=${WORDPRESS_DB_USER-"root"}
+		export WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-}
+		export WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"wordpress"}
+
 		if ! TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
