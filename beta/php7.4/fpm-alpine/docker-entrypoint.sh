@@ -87,10 +87,10 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 		done
 	fi
 
-	WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST-"mysql"}
-	WORDPRESS_DB_USER=${WORDPRESS_DB_USER-"root"}
-	WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-""}
-	WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"mysql"}
+	export WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST-"mysql"}
+	export WORDPRESS_DB_USER=${WORDPRESS_DB_USER-"root"}
+	export WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD-""}
+	export WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME-"mysql"}
 
 	if [ -z ${SKIP_DB_CREATION+x} ]; then
 		if ! TERM=dumb php -- <<'EOPHP'
@@ -101,15 +101,15 @@ $stderr = fopen('php://stderr', 'w');
 //   "hostname:port"
 // https://codex.wordpress.org/Editing_wp-config.php#MySQL_Sockets_or_Pipes
 //   "hostname:unix-socket-path"
-list($host, $socket) = getenv('WORDPRESS_DB_HOST') ? explode(':', getenv('WORDPRESS_DB_HOST'), 2) : 'mysql';
+list($host, $socket) = explode(':', getenv('WORDPRESS_DB_HOST'), 2);
 $port = 0;
 if (is_numeric($socket)) {
 	$port = (int) $socket;
 	$socket = null;
 }
-$user = getenv('WORDPRESS_DB_USER') ?: 'root';
-$pass = getenv('WORDPRESS_DB_PASSWORD') ?: '';
-$dbName = getenv('WORDPRESS_DB_NAME') ?: 'wordpress';
+$user = getenv('WORDPRESS_DB_USER');
+$pass = getenv('WORDPRESS_DB_PASSWORD');
+$dbName = getenv('WORDPRESS_DB_NAME');
 $maxTries = 10;
 do {
 	$mysql = new mysqli($host, $user, $pass, '', $port, $socket);
