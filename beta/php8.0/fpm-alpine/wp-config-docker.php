@@ -26,7 +26,7 @@
 // a helper function to lookup "env_FILE", "env", then fallback
 function getenv_docker($env, $default) {
 	if ($fileEnv = getenv($env . '_FILE')) {
-		return file_get_contents($fileEnv);
+		return rtrim(file_get_contents($fileEnv), "\r\n");
 	}
 	else if (($val = getenv($env)) !== false) {
 		return $val;
