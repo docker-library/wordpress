@@ -26,9 +26,9 @@
 // a helper function to lookup "env_FILE", "env", then fallback
 function getenv_docker($env, $default) {
 	if ($fileEnv = getenv($env . '_FILE')) {
-		return file_get_contents($fileEnv);
+		return rtrim(file_get_contents($fileEnv), "\r\n");
 	}
-	else if ($val = getenv($env)) {
+	else if (($val = getenv($env)) !== false) {
 		return $val;
 	}
 	else {
@@ -38,13 +38,19 @@ function getenv_docker($env, $default) {
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', getenv_docker('WORDPRESS_DB_NAME', 'database_name_here') );
+define( 'DB_NAME', getenv_docker('WORDPRESS_DB_NAME', 'wordpress') );
 
 /** MySQL database username */
-define( 'DB_USER', getenv_docker('WORDPRESS_DB_USER', 'username_here') );
+define( 'DB_USER', getenv_docker('WORDPRESS_DB_USER', 'example username') );
 
 /** MySQL database password */
-define( 'DB_PASSWORD', getenv_docker('WORDPRESS_DB_PASSWORD', 'password_here') );
+define( 'DB_PASSWORD', getenv_docker('WORDPRESS_DB_PASSWORD', 'example password') );
+
+/**
+ * Docker image fallback values above are sourced from the official WordPress installation wizard:
+ * https://github.com/WordPress/WordPress/blob/f9cc35ebad82753e9c86de322ea5c76a9001c7e2/wp-admin/setup-config.php#L216-L230
+ * (However, using "example username" and "example password" in your database is strongly discouraged.  Please use strong, random credentials!)
+ */
 
 /** MySQL hostname */
 define( 'DB_HOST', getenv_docker('WORDPRESS_DB_HOST', 'mysql') );
