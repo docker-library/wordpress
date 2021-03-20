@@ -82,6 +82,11 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 					}
 					{ print }
 				' "$wpConfigDocker" > wp-config.php
+				if [ "$uid" = '0' ]; then
+					# attempt to ensure that wp-config.php is owned by the run user
+					# could be on a filesystem that doesn't allow chown (like some NFS setups)
+					chown "$user:$group" wp-config.php || true
+				fi
 				break
 			fi
 		done
