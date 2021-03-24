@@ -100,6 +100,7 @@ RUN set -ex; \
 {{ if has_imagick then ( -}}
 	pecl install imagick-3.4.4; \
 	docker-php-ext-enable imagick; \
+	rm -r /tmp/pear; \
 {{ ) else "" end -}}
 	\
 {{ if is_alpine then ( -}}

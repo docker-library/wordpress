@@ -45,6 +45,7 @@ RUN set -ex; \
 	; \
 	pecl install imagick-3.4.4; \
 	docker-php-ext-enable imagick; \
+	rm -r /tmp/pear; \
 	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
