@@ -51,13 +51,13 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 		fi
 		# loop over "pluggable" content in the source, and if it already exists in the destination, skip it
 		# https://github.com/docker-library/wordpress/issues/506 ("wp-content" persisted, "akismet" updated, WordPress container restarted/recreated, "akismet" downgraded)
-		for contentDir in \
+		for contentPath in \
 			/usr/src/wordpress/.htaccess \
 			/usr/src/wordpress/wp-content/*/*/ \
 		; do
-			contentDir="${contentDir%/}"
-			[ -d "$contentDir" ] || continue
-			contentPath="${contentDir#/usr/src/wordpress/}" # "wp-content/plugins/akismet", etc.
+			contentPath="${contentPath%/}"
+			[ -e "$contentPath" ] || continue
+			contentPath="${contentPath#/usr/src/wordpress/}" # "wp-content/plugins/akismet", etc.
 			if [ -e "$PWD/$contentPath" ]; then
 				echo >&2 "WARNING: '$PWD/$contentPath' exists! (not copying the WordPress version)"
 				sourceTarArgs+=( --exclude "./$contentPath" )
