@@ -100,8 +100,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 
 RUN set -eux; \
-	version='5.7.1-RC1'; \
-	sha1='dac7c89d00421bf7f40d687fee5fac0053d2d11d'; \
+	version='5.7.1'; \
+	sha1='296bc228c4f4d67d7da8814079f86516f6c2337d'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
