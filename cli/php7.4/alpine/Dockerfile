@@ -41,7 +41,9 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
-	pecl install imagick-3.4.4; \
+# WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
+# https://pecl.php.net/package/imagick
+	pecl install imagick-3.5.0; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
 	\

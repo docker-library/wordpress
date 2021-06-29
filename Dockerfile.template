@@ -2,14 +2,6 @@
 	def is_alpine:
 		env.variant | index("alpine")
 -}}
-{{
-	def has_imagick:
-		# this is a (hopefully temporary) necessity:
-		# - https://github.com/docker-library/wordpress/pull/551
-		# - https://github.com/Imagick/imagick/issues/358
-		# - https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions
-		env.phpVersion | startswith("7")
--}}
 FROM php:{{ env.phpVersion }}-{{ env.variant }}
 
 {{ if env.version != "cli" then ( -}}
@@ -19,14 +11,10 @@ RUN set -eux; \
 	apk add --no-cache \
 # in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
 		bash \
-# BusyBox sed is not sufficient for some of our sed expressions
-		sed \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
-{{ if has_imagick then ( -}}
 # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
 		imagemagick \
-{{ ) else "" end -}}
 	;
 {{ ) else ( -}}
 RUN set -eux; \
@@ -58,9 +46,7 @@ RUN set -ex; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		freetype-dev \
-{{ if has_imagick then ( -}}
 		imagemagick-dev \
-{{ ) else "" end -}}
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libzip-dev \
@@ -72,9 +58,7 @@ RUN set -ex; \
 	apt-get install -y --no-install-recommends \
 		libfreetype6-dev \
 		libjpeg-dev \
-{{ if has_imagick then ( -}}
 		libmagickwand-dev \
-{{ ) else "" end -}}
 		libpng-dev \
 		libzip-dev \
 	; \
@@ -97,11 +81,13 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
-{{ if has_imagick then ( -}}
-	pecl install imagick-3.4.4; \
+{{ if is_alpine then ( -}}
+# WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
+{{ ) else "" end -}}
+# https://pecl.php.net/package/imagick
+	pecl install imagick-3.5.0; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
-{{ ) else "" end -}}
 	\
 {{ if is_alpine then ( -}}
 	runDeps="$( \
