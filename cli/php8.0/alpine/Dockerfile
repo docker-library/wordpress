@@ -24,6 +24,7 @@ RUN set -ex; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		freetype-dev \
+		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libzip-dev \
@@ -40,6 +41,11 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
+# WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
+# https://pecl.php.net/package/imagick
+	pecl install imagick-3.5.0; \
+	docker-php-ext-enable imagick; \
+	rm -r /tmp/pear; \
 	\
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \

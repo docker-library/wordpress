@@ -11,8 +11,6 @@ RUN set -eux; \
 	apk add --no-cache \
 # in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
 		bash \
-# BusyBox sed is not sufficient for some of our sed expressions
-		sed \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
 # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
@@ -42,7 +40,9 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
-	pecl install imagick-3.4.4; \
+# WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
+# https://pecl.php.net/package/imagick
+	pecl install imagick-3.5.0; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
 	\
