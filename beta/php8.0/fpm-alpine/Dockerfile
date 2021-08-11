@@ -119,8 +119,6 @@ RUN set -eux; \
 	chown -R www-data:www-data wp-content; \
 	chmod -R 777 wp-content
 
-VOLUME /var/www/html
-
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 COPY docker-entrypoint.sh /usr/local/bin/
 
