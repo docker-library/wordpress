@@ -126,8 +126,8 @@ RUN set -eux; \
 		echo 'RewriteBase /'; \
 		echo 'RewriteCond %{LA-U:REQUEST_FILENAME} -d'; \
 		echo 'RewriteCond %{REQUEST_URI} !(.*)/$'; \
-    	echo 'RewriteCond %{HTTP:X-Forwarded-Proto} https'; \
-    	echo 'RewriteRule ^.*$ https://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301,QSA]'; \
+		echo 'RewriteCond %{HTTP:X-Forwarded-Proto} https'; \
+		echo 'RewriteRule ^.*$ https://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301,QSA]'; \
 		echo 'RewriteRule ^index\.php$ - [L]'; \
 		echo 'RewriteCond %{REQUEST_FILENAME} !-f'; \
 		echo 'RewriteCond %{REQUEST_FILENAME} !-d'; \
