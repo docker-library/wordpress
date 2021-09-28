@@ -26,6 +26,7 @@ RUN set -ex; \
 		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
+		libwebp-dev \
 		libzip-dev \
 	; \
 	\
@@ -33,6 +34,7 @@ RUN set -ex; \
 		--with-freetype-dir=/usr \
 		--with-jpeg-dir=/usr \
 		--with-png-dir=/usr \
+		--with-webp-dir=/usr \
 	; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
