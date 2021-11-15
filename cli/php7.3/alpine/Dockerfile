@@ -112,5 +112,7 @@ VOLUME /var/www/html
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+
 USER www-data
 CMD ["wp", "shell"]

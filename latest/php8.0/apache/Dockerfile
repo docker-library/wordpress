@@ -150,4 +150,9 @@ COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+# follow https://github.com/docker-library/php/blob/master/7.4/buster/apache/Dockerfile
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL SIGWINCH 
+
 CMD ["apache2-foreground"]
