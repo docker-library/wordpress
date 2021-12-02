@@ -3,7 +3,8 @@
     "phpVersions": [
       "7.4",
       "7.3",
-      "8.0"
+      "8.0",
+      "8.1"
     ],
     "sha1": "4f6e2395bfcba6cb752c33a48c8858c56a9d7b60",
     "upstream": "5.9-beta1",
@@ -18,7 +19,8 @@
     "phpVersions": [
       "7.4",
       "7.3",
-      "8.0"
+      "8.0",
+      "8.1"
     ],
     "sha512": "08dd9035fda1d529807380d5b757839e2809e289eb1a698fe33e7e21a1431d3f77c551c2b2db5adc55083d5075ea4137407994111890f765e790a97e6d9ca7af",
     "variants": [
@@ -30,7 +32,8 @@
     "phpVersions": [
       "7.4",
       "7.3",
-      "8.0"
+      "8.0",
+      "8.1"
     ],
     "sha1": "c3b1b59553eafbf301c83b14c5eeae4cf1c86044",
     "upstream": "5.8.2",
