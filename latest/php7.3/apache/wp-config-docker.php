@@ -8,7 +8,7 @@
  *
  * This file contains the following configurations:
  *
- * * MySQL settings
+ * * Database settings
  * * Secret keys
  * * Database table prefix
  * * ABSPATH
@@ -39,14 +39,14 @@ if (!function_exists('getenv_docker')) {
 	}
 }
 
-// ** MySQL settings - You can get this info from your web host ** //
+// ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define( 'DB_NAME', getenv_docker('WORDPRESS_DB_NAME', 'wordpress') );
 
-/** MySQL database username */
+/** Database username */
 define( 'DB_USER', getenv_docker('WORDPRESS_DB_USER', 'example username') );
 
-/** MySQL database password */
+/** Database password */
 define( 'DB_PASSWORD', getenv_docker('WORDPRESS_DB_PASSWORD', 'example password') );
 
 /**
@@ -55,7 +55,7 @@ define( 'DB_PASSWORD', getenv_docker('WORDPRESS_DB_PASSWORD', 'example password'
  * (However, using "example username" and "example password" in your database is strongly discouraged.  Please use strong, random credentials!)
  */
 
-/** MySQL hostname */
+/** Database hostname */
 define( 'DB_HOST', getenv_docker('WORDPRESS_DB_HOST', 'mysql') );
 
 /** Database charset to use in creating database tables. */
