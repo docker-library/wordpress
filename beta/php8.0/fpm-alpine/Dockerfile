@@ -23,6 +23,7 @@ RUN set -ex; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		freetype-dev \
+		icu-dev \
 		imagemagick-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
@@ -39,6 +40,7 @@ RUN set -ex; \
 		bcmath \
 		exif \
 		gd \
+		intl \
 		mysqli \
 		zip \
 	; \
