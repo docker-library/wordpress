@@ -69,16 +69,9 @@ RUN set -ex; \
 {{ ) end -}}
 	\
 	docker-php-ext-configure gd \
-{{ if env.phpVersion == "7.3" then ( -}}
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
-		--with-webp-dir=/usr \
-{{ ) else ( -}}
 		--with-freetype \
 		--with-jpeg \
 		--with-webp \
-{{ ) end -}}
 	; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
