@@ -103,8 +103,8 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
 
 RUN set -eux; \
-	version='6.1-RC3'; \
-	sha1='b4279fb04f3d1740be62313efa0781af97b398aa'; \
+	version='6.1-RC4'; \
+	sha1='8404dbf002018589eaf35acf7f1f20e459b0b442'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
