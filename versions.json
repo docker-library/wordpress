@@ -5,14 +5,14 @@
       "8.0",
       "8.1"
     ],
-    "sha1": "61377f2b384b167313888fad50b673bfec2121bf",
-    "upstream": "6.1-RC5",
+    "sha1": "0d1b1f2bc07288c2e26705bbb375fe83e9f14b3e",
+    "upstream": "6.1-RC6",
     "variants": [
       "apache",
       "fpm",
       "fpm-alpine"
     ],
-    "version": "6.1-RC5"
+    "version": "6.1-RC6"
   },
   "cli": {
     "phpVersions": [
