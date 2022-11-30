@@ -2,8 +2,10 @@
 set -Eeuo pipefail
 
 # https://wordpress.org/about/requirements/
+# https://make.wordpress.org/hosting/handbook/server-environment/#php
 # https://wordpress.org/support/update-php/#before-you-update-your-php-version
-defaultPhpVersion='php7.4'
+# https://make.wordpress.org/core/handbook/references/php-compatibility-and-wordpress-versions/
+defaultPhpVersion='php8.0'
 defaultVariant='apache'
 
 self="$(basename "$BASH_SOURCE")"
