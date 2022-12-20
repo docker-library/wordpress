@@ -14,7 +14,7 @@ For outstanding `wordpress` image PRs, check [PRs with the "library/wordpress" l
 
 ---
 
--	[![build status badge](https://img.shields.io/github/workflow/status/docker-library/wordpress/GitHub%20CI/master?label=GitHub%20CI)](https://github.com/docker-library/wordpress/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
+-	[![build status badge](https://img.shields.io/github/actions/workflow/status/docker-library/wordpress/ci.yml?branch=master&label=GitHub%20CI)](https://github.com/docker-library/wordpress/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
 -	[![build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/update.sh/job/wordpress.svg?label=Automated%20update.sh)](https://doi-janky.infosiftr.net/job/update.sh/job/wordpress/)
 
 | Build | Status | Badges | (per-arch) |
