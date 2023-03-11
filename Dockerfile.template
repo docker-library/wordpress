@@ -214,7 +214,7 @@ RUN set -eux; \
 		mkdir "wp-content/$dir"; \
 	done; \
 	chown -R www-data:www-data wp-content; \
-	chmod -R 777 wp-content
+	chmod -R 1777 wp-content
 {{ ) else ( -}}
 # https://make.wordpress.org/cli/2018/05/31/gpg-signature-change/
 # pub   rsa2048 2018-05-31 [SC]
