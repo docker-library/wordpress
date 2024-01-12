@@ -43,6 +43,10 @@ for version; do
 		for variant in "${variants[@]}"; do
 			export variant
 
+			if [ "$variant" = 'unit' ] && jq -e '.[env.version][env.variant].phpVersions | index(env.phpVersion) | not' versions.json > /dev/null; then
+				continue
+			fi
+
 			dir="$version/php$phpVersion/$variant"
 			mkdir -p "$dir"
 
@@ -57,6 +61,10 @@ for version; do
 				cp -a cli-entrypoint.sh "$dir/docker-entrypoint.sh"
 			else
 				cp -a docker-entrypoint.sh wp-config-docker.php "$dir/"
+			fi
+
+			if [ "$variant" = 'unit' ]; then
+				cp -a unit.json "$dir/"
 			fi
 		done
 	done
