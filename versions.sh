@@ -12,6 +12,35 @@ else
 fi
 versions=( "${versions[@]%/}" )
 
+unit="$(
+	bashbrew list https://github.com/docker-library/official-images/raw/HEAD/library/unit \
+		| jq -nR '
+			[
+				# filter tags down to just "N[.N[.N]]-phpN.N" (capturing "version" and "php version")
+				inputs
+				| capture(":(?<version>[0-9]+([.][0-9]+)*)-php(?<php>[0-9]+[.][0-9]+)$")
+				| .split = (.version | split(".") | map(tonumber? // .)) # pre-parse version numbers (for filtering and sorting)
+				| select(.split[0] == 1) # filter down to just 1.x versions (attempt to avoid major breakage)
+			]
+			# sort the list in descending version sort order
+			| unique_by([ .split, .php ])
+			| reverse
+			| (
+				# find the highest and least specific version number (2 preferred over 1 over 2.3 over 2.3.4)
+				map(.version)
+				| unique_by(indices(".") | length)
+				| .[0] // error("no suitable unit version found")
+			) as $version
+			| {
+				version: $version,
+				phpVersions: map(
+					select(.version == $version)
+					| .php
+				),
+			}
+		'
+)"
+
 for version in "${versions[@]}"; do
 	export version
 
@@ -55,7 +84,7 @@ for version in "${versions[@]}"; do
 
 	export fullVersion
 	json="$(
-		jq <<<"$json" -c --argjson doc "$doc" '
+		jq <<<"$json" -c --argjson doc "$doc" --argjson unit "$unit" '
 			.[env.version] = {
 				version: env.fullVersion,
 				phpVersions: [ "8.1", "8.2", "8.3" ],
@@ -63,10 +92,12 @@ for version in "${versions[@]}"; do
 					if env.version == "cli" then
 						[ "alpine" ]
 					else
-						[ "apache", "fpm", "fpm-alpine" ]
+						[ "apache", "fpm", "fpm-alpine", "unit" ]
 					end
 				),
-			} + $doc
+			} + if env.version == "cli" then {} else {
+				unit: $unit,
+			} end + $doc
 		'
 	)"
 done

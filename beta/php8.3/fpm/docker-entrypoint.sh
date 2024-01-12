@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
+if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ] || [[ "$1" == unit* ]]; then
 	uid="$(id -u)"
 	gid="$(id -g)"
 	if [ "$uid" = '0' ]; then
@@ -14,6 +14,10 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 				pound='#'
 				user="${user#$pound}"
 				group="${group#$pound}"
+				;;
+			unit*)
+				user='unit'
+				group='unit'
 				;;
 			*) # php-fpm
 				user='www-data'
@@ -93,6 +97,10 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 				break
 			fi
 		done
+	fi
+
+	if [[ "$1" == unit* ]] && [ "$1" != 'unit-entrypoint.sh' ]; then
+		set -- unit-entrypoint.sh "$@"
 	fi
 fi
 
