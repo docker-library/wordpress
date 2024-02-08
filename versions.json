@@ -20,11 +20,11 @@
       "8.2",
       "8.3"
     ],
-    "sha512": "39fa365300ab45840e30cc344595bbd175c3558a4499679edd9f9e3a00a846e94179c29c80de3242f1c405f3623605605748d188d9bb98450d9377388f60f113",
+    "sha512": "c243265be520cd906f6dac767b56bb4e7dae9b6308db32b7e45ed8adbacad97bce987fd69b019d25478f394f0082404a0f44a93416f5e4d943cb32fd08f1feac",
     "variants": [
       "alpine"
     ],
-    "version": "2.9.0"
+    "version": "2.10.0"
   },
   "latest": {
     "phpVersions": [
