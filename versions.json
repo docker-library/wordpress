@@ -32,13 +32,13 @@
       "8.2",
       "8.3"
     ],
-    "sha1": "8c635f812ac7b6da985cc62885c101897229613f",
-    "upstream": "6.5.4",
+    "sha1": "8d6a705f1b59367ec584a5fd4ab84aa53dd01c85",
+    "upstream": "6.5.5",
     "variants": [
       "apache",
       "fpm",
       "fpm-alpine"
     ],
-    "version": "6.5.4"
+    "version": "6.5.5"
   }
 }
