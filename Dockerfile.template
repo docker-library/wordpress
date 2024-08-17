@@ -4,6 +4,10 @@
 -}}
 FROM php:{{ env.phpVersion }}-{{ env.variant }}
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 {{ if env.version != "cli" then ( -}}
 # persistent dependencies
 {{ if is_alpine then ( -}}
@@ -15,7 +19,9 @@ RUN set -eux; \
 		ghostscript \
 # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
 		imagemagick \
-	;
+	; \
+# clean up for reproducibility
+	rm -rf /var/cache/fontconfig
 {{ ) else ( -}}
 RUN set -eux; \
 	apt-get update; \
@@ -23,7 +29,9 @@ RUN set -eux; \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* ; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 {{ ) end -}}
 {{ ) else ( -}}
 # install wp-cli dependencies
@@ -43,7 +51,7 @@ WORKDIR /var/www/html
 RUN set -ex; \
 	\
 {{ if is_alpine then ( -}}
-	apk add --no-cache --virtual .build-deps \
+	apk add --no-cache --virtual .build-deps=0 \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
@@ -123,7 +131,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .wordpress-phpexts-rundeps $runDeps; \
+	apk add --no-network --virtual .wordpress-phpexts-rundeps=0 $runDeps; \
 	apk del --no-network .build-deps; \
 {{ ) else ( -}}
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
@@ -139,6 +147,8 @@ RUN set -ex; \
 	\
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache; \
 {{ ) end -}}
 	\
 	! { ldd "$extDir"/*.so | grep 'not found'; }; \
@@ -247,7 +257,7 @@ ENV WORDPRESS_CLI_SHA512 {{ .sha512 }}
 
 RUN set -ex; \
 	\
-	apk add --no-cache --virtual .fetch-deps \
+	apk add --no-cache --virtual .fetch-deps=0 \
 		gnupg \
 	; \
 	\
