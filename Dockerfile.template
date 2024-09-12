@@ -47,7 +47,8 @@ RUN set -ex; \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
-		imagemagick-dev \
+		imagemagick-dev libheif-dev \
+		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libwebp-dev \
@@ -58,6 +59,7 @@ RUN set -ex; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libavif-dev \
 		libfreetype6-dev \
 		libicu-dev \
 		libjpeg-dev \
@@ -69,6 +71,7 @@ RUN set -ex; \
 {{ ) end -}}
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg \
 		--with-webp \

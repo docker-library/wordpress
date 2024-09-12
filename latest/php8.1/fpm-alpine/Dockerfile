@@ -24,7 +24,8 @@ RUN set -ex; \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
-		imagemagick-dev \
+		imagemagick-dev libheif-dev \
+		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libwebp-dev \
@@ -32,6 +33,7 @@ RUN set -ex; \
 	; \
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg \
 		--with-webp \
