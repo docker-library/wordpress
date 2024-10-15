@@ -93,7 +93,7 @@ define( 'NONCE_SALT',       getenv_docker('WORDPRESS_NONCE_SALT',       'put you
  * You can have multiple installations in one database if you give each
  * a unique prefix. Only numbers, letters, and underscores please!
  *
- * At the installation time, DB tables names with $table_prefix are created.
+ * At the installation time, database tables are created with the specified prefix.
  * Changing this value after WordPress is installed will make your site think
  * it has not been installed.
  *
