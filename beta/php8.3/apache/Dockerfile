@@ -6,6 +6,10 @@
 
 FROM php:8.3-apache
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 # persistent dependencies
 RUN set -eux; \
 	apt-get update; \
@@ -13,7 +17,9 @@ RUN set -eux; \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* ; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
@@ -81,6 +87,8 @@ RUN set -ex; \
 	\
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache; \
 	\
 	! { ldd "$extDir"/*.so | grep 'not found'; }; \
 # check for output like "PHP Warning:  PHP Startup: Unable to load dynamic library 'foo' (tried: ...)
