@@ -6,6 +6,10 @@
 
 FROM php:8.3-fpm-alpine
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 # persistent dependencies
 RUN set -eux; \
 	apk add --no-cache \
@@ -15,12 +19,14 @@ RUN set -eux; \
 		ghostscript \
 # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
 		imagemagick \
-	;
+	; \
+# clean up for reproducibility
+	rm -rf /var/cache/fontconfig
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
-	apk add --no-cache --virtual .build-deps \
+	apk add --no-cache --virtual .build-deps=0 \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
@@ -75,7 +81,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .wordpress-phpexts-rundeps $runDeps; \
+	apk add --no-network --virtual .wordpress-phpexts-rundeps=0 $runDeps; \
 	apk del --no-network .build-deps; \
 	\
 	! { ldd "$extDir"/*.so | grep 'not found'; }; \
