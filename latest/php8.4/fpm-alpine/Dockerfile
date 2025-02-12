@@ -1,12 +1,12 @@
-{{
-	def is_alpine:
-		env.variant | index("alpine")
--}}
-FROM php:{{ env.phpVersion }}-{{ env.variant }}
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
 
-{{ if env.version != "cli" then ( -}}
+FROM php:8.4-fpm-alpine
+
 # persistent dependencies
-{{ if is_alpine then ( -}}
 RUN set -eux; \
 	apk add --no-cache \
 # in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
@@ -16,33 +16,10 @@ RUN set -eux; \
 # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
 		imagemagick \
 	;
-{{ ) else ( -}}
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-# Ghostscript is required for rendering PDF previews
-		ghostscript \
-	; \
-	rm -rf /var/lib/apt/lists/*
-{{ ) end -}}
-{{ ) else ( -}}
-# install wp-cli dependencies
-RUN apk add --no-cache \
-# bash is needed for 'wp shell': https://github.com/wp-cli/shell-command/blob/b8dafcc2a2eba5732fdee70be077675a302848e9/src/WP_CLI/REPL.php#L104
-		bash \
-		less \
-		mysql-client
-
-RUN set -ex; \
-	mkdir -p /var/www/html; \
-	chown -R www-data:www-data /var/www/html
-WORKDIR /var/www/html
-{{ ) end -}}
 
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
-{{ if is_alpine then ( -}}
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 		freetype-dev \
@@ -54,21 +31,6 @@ RUN set -ex; \
 		libwebp-dev \
 		libzip-dev \
 	; \
-{{ ) else ( -}}
-	savedAptMark="$(apt-mark showmanual)"; \
-	\
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		libavif-dev \
-		libfreetype6-dev \
-		libicu-dev \
-		libjpeg-dev \
-		libmagickwand-dev \
-		libpng-dev \
-		libwebp-dev \
-		libzip-dev \
-	; \
-{{ ) end -}}
 	\
 	docker-php-ext-configure gd \
 		--with-avif \
@@ -84,35 +46,24 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
-{{ if is_alpine then ( -}}
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
-{{ ) else "" end -}}
 # https://pecl.php.net/package/imagick
-{{ if true then ( -}}
 # https://github.com/Imagick/imagick/commit/5ae2ecf20a1157073bad0170106ad0cf74e01cb6 (causes a lot of build failures, but strangely only intermittent ones 🤔)
 # see also https://github.com/Imagick/imagick/pull/641
 # this is "pecl install imagick-3.7.0", but by hand so we can apply a small hack / part of the above commit
 	curl -fL -o imagick.tgz 'https://pecl.php.net/get/imagick-3.7.0.tgz'; \
 	echo '5a364354109029d224bcbb2e82e15b248be9b641227f45e63425c06531792d3e *imagick.tgz' | sha256sum -c -; \
 	tar --extract --directory /tmp --file imagick.tgz imagick-3.7.0; \
-{{ if env.phpVersion == "8.4" then ( -}}
 	# Apply patch from this PR https://github.com/Imagick/imagick/pull/690
 	sed -i 's/php_strtolower/zend_str_tolower/g' /tmp/imagick-3.7.0/imagick.c; \
 	# Fix error "Parameter format has null default, but is not nullable"
 	sed -i 's/string \$format = null$/string|null \$format = null/' /tmp/imagick-3.7.0/Imagick.stub.php; \
-{{ ) else "" end -}}
 	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php; \
 	test "$(grep -c '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php)" = '1'; \
 	sed -i -e 's!^//#endif$!#endif!' /tmp/imagick-3.7.0/Imagick.stub.php; \
 	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php && exit 1 || :; \
 	docker-php-ext-install /tmp/imagick-3.7.0; \
 	rm -rf imagick.tgz /tmp/imagick-3.7.0; \
-{{ # TODO when imagick has another release, we should ditch this whole block and just update instead -}}
-{{ ) else ( -}}
-	pecl install imagick-3.7.0; \
-	docker-php-ext-enable imagick; \
-	rm -r /tmp/pear; \
-{{ ) end -}}
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
@@ -122,7 +73,6 @@ RUN set -ex; \
 	\
 	extDir="$(php -r 'echo ini_get("extension_dir");')"; \
 	[ -d "$extDir" ]; \
-{{ if is_alpine then ( -}}
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive "$extDir" \
 			| tr ',' '\n' \
@@ -131,21 +81,6 @@ RUN set -ex; \
 	)"; \
 	apk add --no-network --virtual .wordpress-phpexts-rundeps $runDeps; \
 	apk del --no-network .build-deps; \
-{{ ) else ( -}}
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	apt-mark manual $savedAptMark; \
-	ldd "$extDir"/*.so \
-		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); printf "*%s\n", so }' \
-		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -rt apt-mark manual; \
-	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
-{{ ) end -}}
 	\
 	! { ldd "$extDir"/*.so | grep 'not found'; }; \
 # check for output like "PHP Warning:  PHP Startup: Unable to load dynamic library 'foo' (tried: ...)
@@ -153,7 +88,6 @@ RUN set -ex; \
 	[ -z "$err" ]
 
 # set recommended PHP.ini settings
-{{ if env.version != "cli" then ( -}}
 # see https://secure.php.net/manual/en/opcache.installation.php
 RUN set -eux; \
 	docker-php-ext-enable opcache; \
@@ -163,9 +97,6 @@ RUN set -eux; \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=2'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-{{ ) else ( -}}
-# excluding opcache due https://github.com/docker-library/wordpress/issues/407
-{{ ) end -}}
 # https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
 RUN { \
 # https://www.php.net/manual/en/errorfunc.constants.php
@@ -180,32 +111,10 @@ RUN { \
 		echo 'ignore_repeated_source = Off'; \
 		echo 'html_errors = Off'; \
 	} > /usr/local/etc/php/conf.d/error-logging.ini
-{{ if env.variant == "apache" then ( -}}
 
 RUN set -eux; \
-	a2enmod rewrite expires; \
-	\
-# https://httpd.apache.org/docs/2.4/mod/mod_remoteip.html
-	a2enmod remoteip; \
-	{ \
-		echo 'RemoteIPHeader X-Forwarded-For'; \
-# these IP ranges are reserved for "private" use and should thus *usually* be safe inside Docker
-		echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
-		echo 'RemoteIPInternalProxy 172.16.0.0/12'; \
-		echo 'RemoteIPInternalProxy 192.168.0.0/16'; \
-		echo 'RemoteIPInternalProxy 169.254.0.0/16'; \
-		echo 'RemoteIPInternalProxy 127.0.0.0/8'; \
-	} > /etc/apache2/conf-available/remoteip.conf; \
-	a2enconf remoteip; \
-# https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
-# (replace all instances of "%h" with "%a" in LogFormat)
-	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
-{{ ) else "" end -}}
-
-{{ if env.version != "cli" then ( -}}
-RUN set -eux; \
-	version={{ .upstream | @sh }}; \
-	sha1={{ .sha1 | @sh }}; \
+	version='6.7.1'; \
+	sha1='dfb745d4067368bb9a9491f2b6f7e8d52d740fd1'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
@@ -240,50 +149,11 @@ RUN set -eux; \
 	done; \
 	chown -R www-data:www-data wp-content; \
 	chmod -R 1777 wp-content
-{{ ) else ( -}}
-# https://make.wordpress.org/cli/2018/05/31/gpg-signature-change/
-# pub   rsa2048 2018-05-31 [SC]
-#       63AF 7AA1 5067 C056 16FD  DD88 A3A2 E8F2 26F0 BC06
-# uid           [ unknown] WP-CLI Releases <releases@wp-cli.org>
-# sub   rsa2048 2018-05-31 [E]
-ENV WORDPRESS_CLI_GPG_KEY 63AF7AA15067C05616FDDD88A3A2E8F226F0BC06
-
-ENV WORDPRESS_CLI_VERSION {{ .version }}
-ENV WORDPRESS_CLI_SHA512 {{ .sha512 }}
-
-RUN set -ex; \
-	\
-	apk add --no-cache --virtual .fetch-deps \
-		gnupg \
-	; \
-	\
-	curl -o /usr/local/bin/wp.gpg -fL "https://github.com/wp-cli/wp-cli/releases/download/v${WORDPRESS_CLI_VERSION}/wp-cli-${WORDPRESS_CLI_VERSION}.phar.gpg"; \
-	\
-	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
-	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$WORDPRESS_CLI_GPG_KEY"; \
-	gpg --batch --decrypt --output /usr/local/bin/wp /usr/local/bin/wp.gpg; \
-	gpgconf --kill all; \
-	rm -rf "$GNUPGHOME" /usr/local/bin/wp.gpg; unset GNUPGHOME; \
-	\
-	echo "$WORDPRESS_CLI_SHA512 */usr/local/bin/wp" | sha512sum -c -; \
-	chmod +x /usr/local/bin/wp; \
-	\
-	apk del --no-network .fetch-deps; \
-	\
-	wp --allow-root --version
-{{ ) end -}}
 
 VOLUME /var/www/html
 
-{{ if env.version != "cli" then ( -}}
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
-{{ ) else "" end -}}
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-{{ if env.version != "cli" then ( -}}
-CMD {{ [ if env.variant == "apache" then "apache2-foreground" else "php-fpm" end ] | @json }}
-{{ ) else ( -}}
-USER www-data
-CMD ["wp", "shell"]
-{{ ) end -}}
+CMD ["php-fpm"]
