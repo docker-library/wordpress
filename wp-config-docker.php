@@ -49,6 +49,13 @@ define( 'DB_USER', getenv_docker('WORDPRESS_DB_USER', 'example username') );
 /** Database password */
 define( 'DB_PASSWORD', getenv_docker('WORDPRESS_DB_PASSWORD', 'example password') );
 
+// ** Sqlite Database settings ** //
+/** Sqlite Database directory */
+define( 'DB_DIR', getenv_docker('WORDPRESS_DB_DIR', '/var/www/html/wp-content/database/') );
+
+/** Sqlite Database file */
+define( 'DB_FILE', getenv_docker('WORDPRESS_DB_FILE', 'wordpress.sqlite') );
+
 /**
  * Docker image fallback values above are sourced from the official WordPress installation wizard:
  * https://github.com/WordPress/WordPress/blob/1356f6537220ffdc32b9dad2a6cdbe2d010b7a88/wp-admin/setup-config.php#L224-L238
