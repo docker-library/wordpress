@@ -53,6 +53,7 @@ RUN set -ex; \
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+		unzip \
 	; \
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -67,6 +68,7 @@ RUN set -ex; \
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+		unzip \
 	; \
 {{ ) end -}}
 	\
@@ -232,6 +234,13 @@ RUN set -eux; \
 		dir="$(basename "${dir%/}")"; \
 		mkdir "wp-content/$dir"; \
 	done; \
+	\
+	curl -o sqlite-database-integration.zip -fL "https://downloads.wordpress.org/plugin/sqlite-database-integration.2.1.16.zip"; \
+	unzip sqlite-database-integration.zip -d /usr/src/wordpress/wp-content/plugins/; \
+	cp /usr/src/wordpress/wp-content/plugins/sqlite-database-integration/db.copy /usr/src/wordpress/wp-content/db.php; \
+	sed -ie 's;{SQLITE_IMPLEMENTATION_FOLDER_PATH};/var/www/html/wp-content/plugins/sqlite-database-integration;g' /usr/src/wordpress/wp-content/db.php; \
+	sed -ie 's;{SQLITE_PLUGIN};sqlite-database-integration/load.php;g' /usr/src/wordpress/wp-content/db.php; \
+	\
 	chown -R www-data:www-data wp-content; \
 	chmod -R 1777 wp-content
 {{ ) else ( -}}
