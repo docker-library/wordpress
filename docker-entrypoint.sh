@@ -68,13 +68,13 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 	fi
 
 	wpEnvs=( "${!WORDPRESS_@}" )
-	if [ ! -s wp-config.php ] && [ "${#wpEnvs[@]}" -gt 0 ]; then
+	if [ ! -s wp-config.php ]; then
 		for wpConfigDocker in \
 			wp-config-docker.php \
 			/usr/src/wordpress/wp-config-docker.php \
 		; do
 			if [ -s "$wpConfigDocker" ]; then
-				echo >&2 "No 'wp-config.php' found in $PWD, but 'WORDPRESS_...' variables supplied; copying '$wpConfigDocker' (${wpEnvs[*]})"
+				echo >&2 "No 'wp-config.php' found in $PWD; copying '$wpConfigDocker' (${wpEnvs[*]})"
 				# using "awk" to replace all instances of "put your unique phrase here" with a properly unique string (for AUTH_KEY and friends to have safe defaults if they aren't specified with environment variables)
 				awk '
 					/put your unique phrase here/ {
