@@ -27,22 +27,22 @@ jobs:
           echo "strategy=$strategy" >> "$GITHUB_OUTPUT"
           jq . <<<"$strategy" # sanity check / debugging aid
 
-#  test:
-#    needs: generate-jobs
-#    strategy: ${{ fromJson(needs.generate-jobs.outputs.strategy) }}
-#    name: ${{ matrix.name }}
-#    runs-on: ${{ matrix.os }}
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Prepare Environment
-#        run: ${{ matrix.runs.prepare }}
-#      - name: Pull Dependencies
-#        run: ${{ matrix.runs.pull }}
-#      - name: Build ${{ matrix.name }}
-#        run: ${{ matrix.runs.build }}
-#      - name: History ${{ matrix.name }}
-#        run: ${{ matrix.runs.history }}
-#      - name: Test ${{ matrix.name }}
-#        run: ${{ matrix.runs.test }}
-#      - name: '"docker images"'
-#        run: ${{ matrix.runs.images }}
+  test:
+    needs: generate-jobs
+    strategy: ${{ fromJson(needs.generate-jobs.outputs.strategy) }}
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Environment
+        run: ${{ matrix.runs.prepare }}
+      - name: Pull Dependencies
+        run: ${{ matrix.runs.pull }}
+      - name: Build ${{ matrix.name }}
+        run: ${{ matrix.runs.build }}
+      - name: History ${{ matrix.name }}
+        run: ${{ matrix.runs.history }}
+      - name: Test ${{ matrix.name }}
+        run: ${{ matrix.runs.test }}
+      - name: '"docker images"'
+        run: ${{ matrix.runs.images }}
