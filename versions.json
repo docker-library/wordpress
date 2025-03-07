@@ -43,5 +43,21 @@
       "fpm-alpine"
     ],
     "version": "6.7.2"
+  },
+  "6.6.2": {
+    "phpVersions": [
+      "8.1",
+      "8.2",
+      "8.3",
+      "8.3.16"
+    ],
+    "sha1": "7acbf69d5fdaf804e3db322bad23b08d2e2e42ec",
+    "upstream": "6.6.2",
+    "variants": [
+      "apache",
+      "fpm",
+      "fpm-alpine"
+    ],
+    "version": "6.6.2"
   }
 }
