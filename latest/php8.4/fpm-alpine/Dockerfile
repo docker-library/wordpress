@@ -48,8 +48,7 @@ RUN set -ex; \
 	; \
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
 # https://pecl.php.net/package/imagick
-# RC for PHP 8.4 because of https://github.com/Imagick/imagick/issues/689
-	pecl install imagick-3.8.0RC2; \
+	pecl install imagick-3.8.0; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
 	\
