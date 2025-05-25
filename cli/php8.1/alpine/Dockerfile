@@ -6,6 +6,10 @@
 
 FROM php:8.1-alpine
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 # install wp-cli dependencies
 RUN apk add --no-cache \
 # bash is needed for 'wp shell': https://github.com/wp-cli/shell-command/blob/b8dafcc2a2eba5732fdee70be077675a302848e9/src/WP_CLI/REPL.php#L104
@@ -21,7 +25,7 @@ WORKDIR /var/www/html
 # install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
-	apk add --no-cache --virtual .build-deps \
+	apk add --no-cache --virtual .build-deps=0 \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
@@ -67,7 +71,7 @@ RUN set -ex; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .wordpress-phpexts-rundeps $runDeps; \
+	apk add --no-network --virtual .wordpress-phpexts-rundeps=0 $runDeps; \
 	apk del --no-network .build-deps; \
 	\
 	! { ldd "$extDir"/*.so | grep 'not found'; }; \
@@ -104,7 +108,7 @@ ENV WORDPRESS_CLI_SHA512 be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c
 
 RUN set -ex; \
 	\
-	apk add --no-cache --virtual .fetch-deps \
+	apk add --no-cache --virtual .fetch-deps=0 \
 		gnupg \
 	; \
 	\
