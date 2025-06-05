@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
+if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ] || [ -n "$WORDPRESS_INIT_ONLY" ]; then
 	uid="$(id -u)"
 	gid="$(id -g)"
 	if [ "$uid" = '0' ]; then
@@ -94,6 +94,11 @@ if [[ "$1" == apache2* ]] || [ "$1" = 'php-fpm' ]; then
 			fi
 		done
 	fi
+fi
+
+if [ -n "$WORDPRESS_INIT_ONLY" ]; then
+    echo >&2 "WordPress initialization complete; exiting"
+    exit 0
 fi
 
 exec "$@"
