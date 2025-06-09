@@ -145,6 +145,8 @@ VOLUME /var/www/html
 
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 COPY docker-entrypoint.sh /usr/local/bin/
+# https://github.com/docker-library/wordpress/issues/969
+RUN ln -svfT docker-entrypoint.sh /usr/local/bin/docker-ensure-installed.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
