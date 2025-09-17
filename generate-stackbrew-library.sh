@@ -5,7 +5,10 @@ set -Eeuo pipefail
 # https://make.wordpress.org/hosting/handbook/server-environment/#php
 # https://wordpress.org/support/update-php/#before-you-update-your-php-version
 # https://make.wordpress.org/core/handbook/references/php-compatibility-and-wordpress-versions/
-defaultPhpVersion='php8.2'
+#
+# "RECOMMENDED_PHP" in https://github.com/WordPress/wordpress.org/blob/HEAD/wordpress.org/public_html/wp-content/mu-plugins/pub/servehappy-config.php (https://github.com/docker-library/wordpress/issues/980)
+#
+defaultPhpVersion='php8.3'
 defaultVariant='apache'
 
 self="$(basename "$BASH_SOURCE")"
