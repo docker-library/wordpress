@@ -5,16 +5,16 @@
       "8.2",
       "8.3",
       "8.4",
-      "8.5-rc"
+      "8.5"
     ],
-    "sha1": "fd56bcdc15f1877e45dce67942ea75949ed650e8",
-    "upstream": "6.8.3",
+    "sha1": "f98c7ce5304d9a3543101678e43a2622f76abcd9",
+    "upstream": "6.9-RC3",
     "variants": [
       "apache",
       "fpm",
       "fpm-alpine"
     ],
-    "version": "6.8.3"
+    "version": "6.9-RC3"
   },
   "cli": {
     "phpVersions": [
@@ -22,7 +22,7 @@
       "8.2",
       "8.3",
       "8.4",
-      "8.5-rc"
+      "8.5"
     ],
     "sha512": "be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c98605e6172e6d014dda2e27f88c98befc16c040cbb2bd1bfa121510ea5cdf5f6a30fe8832",
     "variants": [
@@ -36,7 +36,7 @@
       "8.2",
       "8.3",
       "8.4",
-      "8.5-rc"
+      "8.5"
     ],
     "sha1": "fd56bcdc15f1877e45dce67942ea75949ed650e8",
     "upstream": "6.8.3",
