@@ -78,7 +78,8 @@ RUN set -ex; \
 # set recommended PHP.ini settings
 # excluding opcache due https://github.com/docker-library/wordpress/issues/407
 # https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
-RUN { \
+RUN set -eux; \
+	{ \
 # https://www.php.net/manual/en/errorfunc.constants.php
 # https://github.com/docker-library/wordpress/issues/420#issuecomment-517839670
 		echo 'error_reporting = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_RECOVERABLE_ERROR'; \
@@ -90,7 +91,7 @@ RUN { \
 		echo 'ignore_repeated_errors = On'; \
 		echo 'ignore_repeated_source = Off'; \
 		echo 'html_errors = Off'; \
-	} > /usr/local/etc/php/conf.d/error-logging.ini
+	} > "$PHP_INI_DIR/conf.d/error-logging.ini"
 
 # https://make.wordpress.org/cli/2018/05/31/gpg-signature-change/
 # pub   rsa2048 2018-05-31 [SC]
