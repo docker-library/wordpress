@@ -58,7 +58,7 @@ for version in "${versions[@]}"; do
 		jq <<<"$json" -c --argjson doc "$doc" '
 			.[env.version] = {
 				version: env.fullVersion,
-				phpVersions: [ "8.1", "8.2", "8.3", "8.4", "8.5" ],
+				phpVersions: [ "8.2", "8.3", "8.4", "8.5" ],
 				variants: (
 					if env.version == "cli" then
 						[ "alpine" ]
