@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Local modifications: enable verbose tracing when debugging the template application
+# Set DEBUG_APPLY_TEMPLATES=1 to enable `set -x` for troubleshooting.
+if [ "${DEBUG_APPLY_TEMPLATES-0}" = "1" ]; then
+	set -x
+fi
+
 [ -f versions.json ] # run "versions.sh" first
 
 jqt='.jq-template.awk'
@@ -22,6 +28,9 @@ generated_warning() {
 		# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
 		#
 		# PLEASE DO NOT EDIT IT DIRECTLY.
+		#
+		# NOTE: This repository may contain local modifications for testing.
+		# These local edits are not part of the upstream generated sources.
 		#
 
 	EOH

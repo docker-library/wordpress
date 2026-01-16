@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Local modifications: allow enabling shell tracing for debugging
+# Set environment variable DEBUG_ENTRYPOINT=1 to enable `set -x`.
+if [ "${DEBUG_ENTRYPOINT-0}" = "1" ]; then
+	set -x
+fi
+
 if [[ "${1-}" == apache2* ]] || [ "${1-}" = 'php-fpm' ] || { self="$(basename "$0")" && [ "$self" = 'docker-ensure-installed.sh' ]; }; then
 	uid="$(id -u)"
 	gid="$(id -g)"

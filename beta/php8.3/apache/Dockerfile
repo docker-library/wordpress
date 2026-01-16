@@ -6,6 +6,9 @@
 
 FROM php:8.3-apache
 
+# Local modifications: this Dockerfile has local edits for testing/experimentation
+LABEL local.modified="true"
+
 # persistent dependencies
 RUN set -eux; \
 	apt-get update; \
