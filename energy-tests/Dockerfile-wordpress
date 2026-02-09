@@ -1,4 +1,4 @@
-FROM wordpress:6.9.0-php8.3-apache
+FROM wordpress:6.9.1-php8.3-apache
 EXPOSE 9875
 COPY ./html /var/www/html
 COPY ./wordpress.conf /etc/apache2/sites-enabled/wordpress.conf
