@@ -12,6 +12,21 @@ else
 fi
 versions=( "${versions[@]%/}" )
 
+# get latest version of pie for installing extensions (like imagick)
+pie="$(
+	curl -fsSL -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' 'https://api.github.com/repos/php/pie/releases/latest' \
+	| jq -c '
+		([.assets[] | select(.name == "pie.phar")][0]) as $pie
+		| {
+			pie: {
+				version: .tag_name,
+				url: $pie.browser_download_url,
+				sha256: ($pie.digest | ltrimstr("sha256:"))
+			},
+		}
+	'
+)"
+
 for version in "${versions[@]}"; do
 	export version
 
@@ -55,7 +70,7 @@ for version in "${versions[@]}"; do
 
 	export fullVersion
 	json="$(
-		jq <<<"$json" -c --argjson doc "$doc" '
+		jq <<<"$json" -c --argjson doc "$doc" --argjson pie "$pie" '
 			.[env.version] = {
 				version: env.fullVersion,
 				phpVersions: [ "8.2", "8.3", "8.4", "8.5" ],
@@ -66,7 +81,7 @@ for version in "${versions[@]}"; do
 						[ "apache", "fpm", "fpm-alpine" ]
 					end
 				),
-			} + $doc
+			} + $doc + $pie
 		'
 	)"
 done
