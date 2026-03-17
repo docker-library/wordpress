@@ -46,11 +46,17 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
+	\
+# install pie to install imagick
+	PIE_WORKING_DIRECTORY="$(mktemp -d)"; export PIE_WORKING_DIRECTORY; \
+	curl -fsSL -o /usr/local/bin/pie 'https://github.com/php/pie/releases/download/1.3.9/pie.phar'; \
+	echo 'b36a28d67e78a0ae3f9ae3329d0dacacd19f1b4bbaf31f057d45446329833e57 */usr/local/bin/pie' | sha256sum -c; \
+	chmod +x /usr/local/bin/pie; \
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
-# https://pecl.php.net/package/imagick
-	pecl install imagick-3.8.1; \
-	docker-php-ext-enable imagick; \
-	rm -r /tmp/pear; \
+# https://packagist.org/packages/imagick/imagick
+	pie install imagick/imagick:3.8.1; \
+# remove pie and cleanup cruft
+	rm -r /usr/local/bin/pie "$PIE_WORKING_DIRECTORY" /root/.composer; \
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \

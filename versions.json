@@ -6,6 +6,11 @@
       "8.4",
       "8.5"
     ],
+    "pie": {
+      "sha256": "b36a28d67e78a0ae3f9ae3329d0dacacd19f1b4bbaf31f057d45446329833e57",
+      "url": "https://github.com/php/pie/releases/download/1.3.9/pie.phar",
+      "version": "1.3.9"
+    },
     "sha1": "ba5b170b627cae0a73939bc1b03978a738906b82",
     "upstream": "7.0-beta5",
     "variants": [
@@ -22,6 +27,11 @@
       "8.4",
       "8.5"
     ],
+    "pie": {
+      "sha256": "b36a28d67e78a0ae3f9ae3329d0dacacd19f1b4bbaf31f057d45446329833e57",
+      "url": "https://github.com/php/pie/releases/download/1.3.9/pie.phar",
+      "version": "1.3.9"
+    },
     "sha512": "be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c98605e6172e6d014dda2e27f88c98befc16c040cbb2bd1bfa121510ea5cdf5f6a30fe8832",
     "variants": [
       "alpine"
@@ -35,6 +45,11 @@
       "8.4",
       "8.5"
     ],
+    "pie": {
+      "sha256": "b36a28d67e78a0ae3f9ae3329d0dacacd19f1b4bbaf31f057d45446329833e57",
+      "url": "https://github.com/php/pie/releases/download/1.3.9/pie.phar",
+      "version": "1.3.9"
+    },
     "sha1": "018542f4c3e15db0d8e38aaf0fcf1b5dc56dbb79",
     "upstream": "6.9.4",
     "variants": [
