@@ -4,7 +4,8 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:8.3-fpm
+FROM php:8.3.36-fpm
+
 
 # persistent dependencies
 RUN set -eux; \

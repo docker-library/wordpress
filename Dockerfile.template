@@ -1,8 +1,16 @@
 {{
 	def is_alpine:
-		env.variant | index("alpine")
+		env.variant | index("alpine");
+	def php_patch_version:
+		{
+			"8.2": "8.2.35",
+			"8.3": "8.3.36",
+			"8.4": "8.4.27",
+			"8.5": "8.5.12"
+		}[env.phpVersion] // env.phpVersion
 -}}
-FROM php:{{ env.phpVersion }}-{{ env.variant }}
+FROM php:{{ php_patch_version }}-{{ env.variant }}
+
 
 {{ if env.version != "cli" then ( -}}
 # persistent dependencies
