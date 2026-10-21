@@ -103,6 +103,21 @@ RUN set -eux; \
 		echo 'html_errors = Off'; \
 	} > "$PHP_INI_DIR/conf.d/error-logging.ini"
 
+# mitigations for CVE-2026-109618 and CVE-2026-109619
+# https://www.php.net/archive/2026.php#2026-10-21-5
+RUN set -eux; \
+	{ \
+		echo '; Mitigation for CVE-2026-109619 (RCE via stale global state)'; \
+		echo 'session.upload_progress.enabled = 0'; \
+		echo '; Mitigation for CVE-2026-109619 on PHP 8.5'; \
+		echo 'fatal_error_backtraces = 0'; \
+		echo ''; \
+		echo '; Mitigation for CVE-2026-109618 (RCE via OOM corruption)'; \
+		echo 'memory_limit = -1'; \
+		echo 'post_max_size = 32M'; \
+		echo 'upload_max_filesize = 30M'; \
+	} > "$PHP_INI_DIR/conf.d/security-mitigations.ini"
+
 RUN set -eux; \
 	version='7.1.3'; \
 	sha1='491a78c7676b15dffcc69130c6054b8f49228a91'; \
