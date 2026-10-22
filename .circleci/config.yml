@@ -1,0 +1,117 @@
+# Fork of docker-library/wordpress: every week, merge upstream into master then
+# build the WordPress branches x PHP versions used by our sites, each with its
+# latest WordPress patch and the latest PHP patch (php:X.Y-fpm-alpine).
+# Our files live in .circleci/ and dow/ only, so upstream merges never conflict.
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@5.4.1
+  aws-ecr: circleci/aws-ecr@9.8.1
+
+executors:
+  build-executor:
+    machine:
+      image: default
+    resource_class: medium
+
+jobs:
+  sync-upstream:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      # no "checkout": the read-only checkout key would be picked for the push
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:YvxD+dpQBhbZ0NqMC2rAbTXr0Xr6svDWZaVKBXLBuHk"
+      - run:
+          name: Merge docker-library/wordpress into master
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+            git clone --branch master "git@github.com:${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" .
+            git remote add upstream https://github.com/docker-library/wordpress.git
+            git fetch upstream master
+            git -c user.name='CircleCI' -c user.email='circleci@users.noreply.github.com' \
+              merge --no-edit upstream/master
+            git push origin master
+      - persist_to_workspace:
+          root: .
+          paths: [.]
+
+  build:
+    parameters:
+      version:
+        description: '"<wordpress branch>-php<php version>", e.g. 6.8-php8.3'
+        type: string
+    executor: build-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Render Dockerfile
+          command: |
+            command -v gawk > /dev/null || { sudo apt-get update && sudo apt-get install -y gawk; }
+            dow/prepare.sh << parameters.version >> >> "$BASH_ENV"
+            source "$BASH_ENV"
+            docker run --rm "php:${PHP_VERSION}-fpm-alpine" php -r 'echo "PHP ", PHP_VERSION, PHP_EOL;'
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup:
+                role_arn: ${AWS_ROLE_ARN}
+          checkout: false
+          path: ${BUILD_DIR}
+          build_path: ${BUILD_DIR}
+          extra_build_args: --provenance=false
+          repo: asmodee-services/wordpress
+          create_repo: true
+          tag: << parameters.version >>-fpm-alpine,${WP_FULL_VERSION}-php${PHP_VERSION}-fpm-alpine
+
+  trigger-wordpress-base:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Trigger docker-wordpress-base master pipeline
+          command: |
+            curl --fail-with-body -sS -X POST \
+              -H "Circle-Token: ${CIRCLE_TOKEN}" \
+              -H 'Content-Type: application/json' \
+              -d '{"branch": "master"}' \
+              https://circleci.com/api/v2/project/gh/daysofwonder/docker-wordpress-base/pipeline
+
+workflows:
+  # scheduled pipeline (Project Settings > Triggers), or "Trigger Pipeline"
+  # from the UI/API; never on push since sync-upstream pushes to master
+  weekly-build:
+    when:
+      or:
+        - equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+        - equal: [api, << pipeline.trigger_source >>]
+    jobs:
+      - sync-upstream
+
+      - build:
+          requires: [sync-upstream]
+          context: [aws-legacy]
+          matrix:
+            parameters:
+              # "<wordpress branch>-php<php version>" used by our sites
+              # (ARG WORDPRESS_BASE_VERSION of their Dockerfile), plus PHP 8.4
+              # and 8.5 from WordPress 6.8 on; keep in sync with the
+              # docker-wordpress-base matrix (dow/Makefile reads this list)
+              version:
+                - "6.4-php8.2"
+                - "6.6-php8.2"
+                - "6.7-php8.2"
+                - "6.8-php8.4"
+                - "6.8-php8.5"
+                - "6.9-php8.4"
+                - "6.9-php8.5"
+                - "7.1-php8.4"
+                - "7.1-php8.5"
+
+      - trigger-wordpress-base:
+          requires: [build]
+          context: [circleci-api]
