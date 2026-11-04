@@ -60,8 +60,12 @@ for version in "${versions[@]}"; do
 				version: env.fullVersion,
 				phpVersions: (
 					[ "8.2", "8.3", "8.4", "8.5" ]
-					# PHP 8.6 is only available as an RC upstream, so only include it for pre-release WordPress
-					+ if env.version == "beta" then [ "8.6" ] else [] end
+					# PHP 8.6 is only supported by WordPress 7.2+ (regardless of channel; "cli" is WP-CLI, not WordPress)
+					+ if env.version != "cli" and (
+						env.fullVersion
+						| capture("^(?<major>[0-9]+)[.](?<minor>[0-9]+)")
+						| [ (.major, .minor) | tonumber ] >= [ 7, 2 ]
+					) then [ "8.6" ] else [] end
 				),
 				variants: (
 					if env.version == "cli" then

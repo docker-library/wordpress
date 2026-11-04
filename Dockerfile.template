@@ -2,7 +2,7 @@
 	def is_alpine:
 		env.variant | index("alpine")
 	;
-	# PHP versions that only exist as release candidates upstream (the "beta" channel only); remove once GA
+	# PHP versions that only exist as release candidates upstream; remove once GA
 	def is_php_rc:
 		env.phpVersion | IN("8.6")
 	;
