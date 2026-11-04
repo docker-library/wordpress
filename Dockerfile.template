@@ -1,8 +1,16 @@
 {{
 	def is_alpine:
 		env.variant | index("alpine")
+	;
+	# PHP versions that only exist as release candidates upstream (the "beta" channel only); remove once GA
+	def is_php_rc:
+		env.phpVersion | IN("8.6")
+	;
+	# PHP 8.6+ images no longer ship pear/pecl or a compiled-in mbstring: https://github.com/docker-library/php/pull/1654
+	def has_pecl:
+		env.phpVersion | IN("8.2", "8.3", "8.4", "8.5")
 -}}
-FROM php:{{ env.phpVersion }}-{{ env.variant }}
+FROM php:{{ env.phpVersion }}{{ if is_php_rc then "-rc" else "" end }}-{{ env.variant }}
 
 {{ if env.version != "cli" then ( -}}
 # persistent dependencies
@@ -60,6 +68,9 @@ RUN set -ex; \
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+{{ if has_pecl then "" else ( -}}
+		oniguruma-dev \
+{{ ) end -}}
 	; \
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -74,6 +85,9 @@ RUN set -ex; \
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+{{ if has_pecl then "" else ( -}}
+		libonig-dev \
+{{ ) end -}}
 	; \
 {{ ) end -}}
 	\
@@ -90,14 +104,28 @@ RUN set -ex; \
 		intl \
 		mysqli \
 		zip \
+{{ if has_pecl then "" else ( -}}
+		mbstring \
+{{ ) end -}}
 	; \
 {{ if is_alpine then ( -}}
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
 {{ ) else "" end -}}
 # https://pecl.php.net/package/imagick
+{{ if has_pecl then ( -}}
 	pecl install imagick-3.8.1; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
+{{ ) else ( -}}
+	docker-php-source extract; \
+	mkdir /usr/src/php/ext/imagick; \
+	curl -fsSL -o imagick.tgz 'https://pecl.php.net/get/imagick-3.8.1.tgz'; \
+	echo '3a3587c0a524c17d0dad9673a160b90cd776e836838474e173b549ed864352ee *imagick.tgz' | sha256sum -c -; \
+	tar -xzf imagick.tgz -C /usr/src/php/ext/imagick --strip-components=1; \
+	rm imagick.tgz; \
+	docker-php-ext-install -j "$(nproc)" imagick; \
+	docker-php-source delete; \
+{{ ) end -}}
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
