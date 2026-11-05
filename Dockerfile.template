@@ -9,6 +9,10 @@
 	# PHP 8.6+ images no longer ship pear/pecl or a compiled-in mbstring: https://github.com/docker-library/php/pull/1654
 	def has_pecl:
 		env.phpVersion | IN("8.2", "8.3", "8.4", "8.5")
+	;
+	# no imagick release supports PHP 8.6 yet (https://github.com/Imagick/imagick/issues/768), and installing it without pecl is pending https://github.com/docker-library/wordpress/pull/1001
+	def has_imagick:
+		has_pecl
 -}}
 FROM php:{{ env.phpVersion }}{{ if is_php_rc then "-rc" else "" end }}-{{ env.variant }}
 
@@ -62,7 +66,9 @@ RUN set -ex; \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
+{{ if has_imagick then ( -}}
 		imagemagick-dev libheif-dev \
+{{ ) else "" end -}}
 		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
@@ -81,7 +87,9 @@ RUN set -ex; \
 		libfreetype6-dev \
 		libicu-dev \
 		libjpeg-dev \
+{{ if has_imagick then ( -}}
 		libmagickwand-dev \
+{{ ) else "" end -}}
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
@@ -108,24 +116,15 @@ RUN set -ex; \
 		mbstring \
 {{ ) end -}}
 	; \
+{{ if has_imagick then ( -}}
 {{ if is_alpine then ( -}}
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
 {{ ) else "" end -}}
 # https://pecl.php.net/package/imagick
-{{ if has_pecl then ( -}}
 	pecl install imagick-3.8.1; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
-{{ ) else ( -}}
-	docker-php-source extract; \
-	mkdir /usr/src/php/ext/imagick; \
-	curl -fsSL -o imagick.tgz 'https://pecl.php.net/get/imagick-3.8.1.tgz'; \
-	echo '3a3587c0a524c17d0dad9673a160b90cd776e836838474e173b549ed864352ee *imagick.tgz' | sha256sum -c -; \
-	tar -xzf imagick.tgz -C /usr/src/php/ext/imagick --strip-components=1; \
-	rm imagick.tgz; \
-	docker-php-ext-install -j "$(nproc)" imagick; \
-	docker-php-source delete; \
-{{ ) end -}}
+{{ ) else "" end -}}
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
