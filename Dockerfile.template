@@ -2,10 +2,6 @@
 	def is_alpine:
 		env.variant | index("alpine")
 	;
-	# PHP versions that only exist as release candidates upstream; remove once GA
-	def is_php_rc:
-		env.phpVersion | IN("8.6")
-	;
 	# PHP 8.6+ images no longer ship pear/pecl or a compiled-in mbstring: https://github.com/docker-library/php/pull/1654
 	def has_pecl:
 		env.phpVersion | IN("8.2", "8.3", "8.4", "8.5")
@@ -14,7 +10,7 @@
 	def has_imagick:
 		has_pecl
 -}}
-FROM php:{{ env.phpVersion }}{{ if is_php_rc then "-rc" else "" end }}-{{ env.variant }}
+FROM php:{{ env.phpVersion }}-{{ env.variant }}
 
 {{ if env.version != "cli" then ( -}}
 # persistent dependencies
