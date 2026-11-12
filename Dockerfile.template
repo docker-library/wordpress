@@ -1,6 +1,14 @@
 {{
 	def is_alpine:
 		env.variant | index("alpine")
+	;
+	# PHP 8.6+ images no longer ship pear/pecl or a compiled-in mbstring: https://github.com/docker-library/php/pull/1654
+	def has_pecl:
+		env.phpVersion | IN("8.2", "8.3", "8.4", "8.5")
+	;
+	# no imagick release supports PHP 8.6 yet (https://github.com/Imagick/imagick/issues/768), and installing it without pecl is pending https://github.com/docker-library/wordpress/pull/1001
+	def has_imagick:
+		has_pecl
 -}}
 FROM php:{{ env.phpVersion }}-{{ env.variant }}
 
@@ -54,12 +62,17 @@ RUN set -ex; \
 		$PHPIZE_DEPS \
 		freetype-dev \
 		icu-dev \
+{{ if has_imagick then ( -}}
 		imagemagick-dev libheif-dev \
+{{ ) else "" end -}}
 		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+{{ if has_pecl then "" else ( -}}
+		oniguruma-dev \
+{{ ) end -}}
 	; \
 {{ ) else ( -}}
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -70,10 +83,15 @@ RUN set -ex; \
 		libfreetype6-dev \
 		libicu-dev \
 		libjpeg-dev \
+{{ if has_imagick then ( -}}
 		libmagickwand-dev \
+{{ ) else "" end -}}
 		libpng-dev \
 		libwebp-dev \
 		libzip-dev \
+{{ if has_pecl then "" else ( -}}
+		libonig-dev \
+{{ ) end -}}
 	; \
 {{ ) end -}}
 	\
@@ -90,7 +108,11 @@ RUN set -ex; \
 		intl \
 		mysqli \
 		zip \
+{{ if has_pecl then "" else ( -}}
+		mbstring \
+{{ ) end -}}
 	; \
+{{ if has_imagick then ( -}}
 {{ if is_alpine then ( -}}
 # WARNING: imagick is likely not supported on Alpine: https://github.com/Imagick/imagick/issues/328
 {{ ) else "" end -}}
@@ -98,6 +120,7 @@ RUN set -ex; \
 	pecl install imagick-3.8.1; \
 	docker-php-ext-enable imagick; \
 	rm -r /tmp/pear; \
+{{ ) else "" end -}}
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
