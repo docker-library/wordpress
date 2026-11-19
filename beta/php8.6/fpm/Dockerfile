@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:8.6-rc-fpm
+FROM php:8.6-fpm
 
 # persistent dependencies
 RUN set -eux; \
@@ -106,8 +106,8 @@ RUN set -eux; \
 	} > "$PHP_INI_DIR/conf.d/error-logging.ini"
 
 RUN set -eux; \
-	version='7.2-beta4'; \
-	sha1='10ece733e01d895936afb85e1862b94954242f91'; \
+	version='7.2-RC2'; \
+	sha1='723bc521dfb8a34350ecbe9750e4f6d16c6a0701'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \

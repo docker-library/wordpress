@@ -59,9 +59,8 @@ for version in "${versions[@]}"; do
 			.[env.version] = {
 				version: env.fullVersion,
 				phpVersions: (
-					[ "8.2", "8.3", "8.4", "8.5" ]
-					# PHP 8.6 is only available as an RC upstream
-					+ if env.version == "beta" then [ "8.6-rc" ] else [] end
+					# TODO scrape these from `php` itself?
+					[ "8.2", "8.3", "8.4", "8.5", "8.6" ]
 				),
 				variants: (
 					if env.version == "cli" then
