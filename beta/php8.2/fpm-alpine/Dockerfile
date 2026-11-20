@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm-alpine3.24
 
 # persistent dependencies
 RUN set -eux; \

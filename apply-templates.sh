@@ -12,7 +12,7 @@ elif [ "$BASH_SOURCE" -nt "$jqt" ]; then
 fi
 
 if [ "$#" -eq 0 ]; then
-	versions="$(jq -r 'keys | map(@sh) | join(" ")' versions.json)"
+	versions="$(jq -r 'keys_unsorted | map(@sh) | join(" ")' versions.json)"
 	eval "set -- $versions"
 fi
 
@@ -32,13 +32,14 @@ for version; do
 
 	rm -rf "$version/"
 
-	phpVersions="$(jq -r '.[env.version].phpVersions | map(@sh) | join(" ")' versions.json)"
+	phpVersions="$(jq -r '.[env.version].php | keys_unsorted | map(@sh) | join(" ")' versions.json)"
 	eval "phpVersions=( $phpVersions )"
-	variants="$(jq -r '.[env.version].variants | map(@sh) | join(" ")' versions.json)"
-	eval "variants=( $variants )"
 
 	for phpVersion in "${phpVersions[@]}"; do
 		export phpVersion
+
+		variants="$(jq -r '.[env.version].php[env.phpVersion].variants | keys_unsorted | map(@sh) | join(" ")' versions.json)"
+		eval "variants=( $variants )"
 
 		for variant in "${variants[@]}"; do
 			export variant

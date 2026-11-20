@@ -1,50 +1,573 @@
 {
+  "latest": {
+    "version": "7.1.5",
+    "sha1": "f79cd80a8f8152edd88ef9be859ae765f2ec6c36",
+    "phpDefault": "8.5",
+    "php": {
+      "8.6": {
+        "variants": {
+          "apache": {
+            "from": "php:8.6-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.6-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.6-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.5": {
+        "variants": {
+          "apache": {
+            "from": "php:8.5-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.5-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.5-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.4": {
+        "variants": {
+          "apache": {
+            "from": "php:8.4-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.4-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.4-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.3": {
+        "variants": {
+          "apache": {
+            "from": "php:8.3-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.3-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.3-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.2": {
+        "variants": {
+          "apache": {
+            "from": "php:8.2-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.2-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.2-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      }
+    }
+  },
   "beta": {
-    "phpVersions": [
-      "8.2",
-      "8.3",
-      "8.4",
-      "8.5",
-      "8.6"
-    ],
+    "version": "7.2-RC2",
     "sha1": "723bc521dfb8a34350ecbe9750e4f6d16c6a0701",
-    "upstream": "7.2-RC2",
-    "variants": [
-      "apache",
-      "fpm",
-      "fpm-alpine"
-    ],
-    "version": "7.2-RC2"
+    "phpDefault": "8.5",
+    "php": {
+      "8.6": {
+        "variants": {
+          "apache": {
+            "from": "php:8.6-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.6-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.6-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.5": {
+        "variants": {
+          "apache": {
+            "from": "php:8.5-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.5-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.5-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.4": {
+        "variants": {
+          "apache": {
+            "from": "php:8.4-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.4-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.4-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.3": {
+        "variants": {
+          "apache": {
+            "from": "php:8.3-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.3-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.3-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.2": {
+        "variants": {
+          "apache": {
+            "from": "php:8.2-apache-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm": {
+            "from": "php:8.2-fpm-trixie",
+            "suite": "trixie",
+            "arches": [
+              "amd64",
+              "arm32v5",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          },
+          "fpm-alpine": {
+            "from": "php:8.2-fpm-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      }
+    }
   },
   "cli": {
-    "phpVersions": [
-      "8.2",
-      "8.3",
-      "8.4",
-      "8.5",
-      "8.6"
-    ],
+    "version": "2.12.0",
     "sha512": "be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c98605e6172e6d014dda2e27f88c98befc16c040cbb2bd1bfa121510ea5cdf5f6a30fe8832",
-    "variants": [
-      "alpine"
-    ],
-    "version": "2.12.0"
-  },
-  "latest": {
-    "phpVersions": [
-      "8.2",
-      "8.3",
-      "8.4",
-      "8.5",
-      "8.6"
-    ],
-    "sha1": "f79cd80a8f8152edd88ef9be859ae765f2ec6c36",
-    "upstream": "7.1.5",
-    "variants": [
-      "apache",
-      "fpm",
-      "fpm-alpine"
-    ],
-    "version": "7.1.5"
+    "phpDefault": "8.5",
+    "php": {
+      "8.6": {
+        "variants": {
+          "alpine": {
+            "from": "php:8.6-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.5": {
+        "variants": {
+          "alpine": {
+            "from": "php:8.5-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.4": {
+        "variants": {
+          "alpine": {
+            "from": "php:8.4-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.3": {
+        "variants": {
+          "alpine": {
+            "from": "php:8.3-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      },
+      "8.2": {
+        "variants": {
+          "alpine": {
+            "from": "php:8.2-alpine3.24",
+            "suite": "alpine3.24",
+            "arches": [
+              "amd64",
+              "arm32v6",
+              "arm32v7",
+              "arm64v8",
+              "i386",
+              "ppc64le",
+              "riscv64",
+              "s390x"
+            ]
+          }
+        }
+      }
+    }
   }
 }
