@@ -4,13 +4,13 @@
 	;
 	# PHP 8.6+ images no longer ship pear/pecl or a compiled-in mbstring: https://github.com/docker-library/php/pull/1654
 	def has_pecl:
-		env.phpVersion | IN("8.2", "8.3", "8.4", "8.5")
+		IN(env.phpVersion; "8.2", "8.3", "8.4", "8.5")
 	;
 	# no imagick release supports PHP 8.6 yet (https://github.com/Imagick/imagick/issues/768), and installing it without pecl is pending https://github.com/docker-library/wordpress/pull/1001
 	def has_imagick:
 		has_pecl
 -}}
-FROM php:{{ env.phpVersion }}-{{ env.variant }}
+FROM {{ .php[env.phpVersion].variants[env.variant].from }}
 
 {{ if env.version != "cli" then ( -}}
 # persistent dependencies
@@ -213,7 +213,7 @@ RUN set -eux; \
 
 {{ if env.version != "cli" then ( -}}
 RUN set -eux; \
-	version={{ .upstream | @sh }}; \
+	version={{ .version | @sh }}; \
 	sha1={{ .sha1 | @sh }}; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \

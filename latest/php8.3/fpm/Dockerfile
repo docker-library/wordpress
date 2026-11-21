@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:8.3-fpm
+FROM php:8.3-fpm-trixie
 
 # persistent dependencies
 RUN set -eux; \

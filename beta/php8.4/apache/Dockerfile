@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM php:8.4-apache
+FROM php:8.4-apache-trixie
 
 # persistent dependencies
 RUN set -eux; \
